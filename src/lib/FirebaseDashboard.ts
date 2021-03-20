@@ -17,19 +17,21 @@ export default class FirebaseDashboard {
 
   async listUsers(): Promise<object[]> {
     const userList: object[] = [];
-    let nextPageToken: string = '';
+    let nextPageToken: string | undefined = undefined;
 
     do {
-      await this.firebase.auth().listUsers(PAGING_RESULTS_IN_ONE_PAGE, nextPageToken).then((listUsersResult) => {
+      await this.firebase
+        .auth()
+        .listUsers(PAGING_RESULTS_IN_ONE_PAGE, nextPageToken)
+        .then(listUsersResult => {
+          listUsersResult.users.forEach(userRecord => {
+            userList.push(userRecord.toJSON());
+          });
 
-        listUsersResult.users.forEach((userRecord) => {
-          userList.push(userRecord.toJSON());
+          nextPageToken = listUsersResult.pageToken;
         });
-
-        nextPageToken = listUsersResult.pageToken;
-      });
     } while (nextPageToken);
 
     return userList;
   }
-};
+}

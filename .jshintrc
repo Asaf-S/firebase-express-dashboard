@@ -1,0 +1,5 @@
+{
+    "esversion": 9,
+    "-W014": true,
+    "comma-dangle": ["error", "only-multiline"]
+}
