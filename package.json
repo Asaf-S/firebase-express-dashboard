@@ -7,7 +7,20 @@
     "test": "echo \"No test specified\"",
     "publish": "np"
   },
-  "author": "",
+  "bugs": {
+    "url": "https://github.com/Asaf-S/firebase-express-dashboard/issues"
+  },
+  "keywords": [
+    "firebase",
+    "auth",
+    "authentication"
+  ],
+  "homepage": "https://github.com/Asaf-S/firebase-express-dashboard#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Asaf-S/firebase-express-dashboard.git"
+  },
+  "author": "Asaf S.",
   "license": "MIT",
   "devDependencies": {
     "@types/express": "^4.17.11",
