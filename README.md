@@ -1,6 +1,7 @@
 # firebase-express-dashboard
 
-Add Expess.js CRUD routes to manage Firebase Auth.
+Add CRUD routes that manage Firebase Auth to Expess.js.
+
 Also, it exposes a dashboard to manage it all.
 
 ```typescript
