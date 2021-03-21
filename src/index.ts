@@ -1,5 +1,4 @@
 'use strict';
-import path from 'path';
 import express from 'express';
 import * as FirebaseAdmin from 'firebase-admin';
 import FirebaseDashboard from './lib/FirebaseDashboard';
