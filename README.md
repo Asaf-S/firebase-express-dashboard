@@ -6,7 +6,7 @@ Also, it exposes a dashboard to manage it all.
 
 ![Dashboard](./screenshot.png)
 
-```typescript
+```javascript
 import firebaseDashboard from 'firebase-express-dashboard';
 
 const serviceAccount: object = {
