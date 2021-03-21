@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"No test specified\"",
+    "test": "rimraf ./dist && jest --forceExit",
     "publish": "np",
     "prepare": "husky install"
   },
