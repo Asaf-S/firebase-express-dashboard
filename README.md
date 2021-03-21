@@ -49,7 +49,7 @@ app.listen(PORT, () => console.log(`Express - Listening on ${PORT}`));
 
 Then navigate to either of the following to see the dashboard's UI:
 http://localhost:5000/firebaseDashboard (if the port for development is 5000)
-https://your_domain.com/firebaseDashboard
+[https://your_domain.com/firebaseDashboard](https://your_domain.com/firebaseDashboard)
 
 The dashboard's UI can be also be embedded in other websites using an iframe.
 
