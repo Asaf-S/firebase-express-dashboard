@@ -1,23 +1,72 @@
 <html>
-  <head>
-    <script src="https://cdn.jsdelivr.net/npm/superagent"></script>
-  </head>
-  <body>Hello World!<br>
-  <div id="main"></div>
+
+<head>
+  <script src="https://cdn.jsdelivr.net/npm/superagent"></script>
+</head>
+
+<body>
+  <div style="display: flex; " >
+    <h1 style="margin-right: 30px;">Users</h1>
+    <div style="display: flex; align-items: center;">
+      <button onclick="alert('Will be developed soon!')">Create new user</button>
+    </div>
+  </div>
+  <div id="main">Loading...</div>
   <script>
-    (function() {
-    // superagent is exposed as `window.superagent`
-    // if you wish to use "request" instead please
-    // uncomment the following line of code:
-    // `window.request = superagent;`
-    superagent
-      .get('users')
-      .set('X-API-Key', 'foobar')
-      .end(function (err, res) {
-        const mainElem = document.getElementById('main');
-        mainElem.innerText = JSON.stringify(res.body || [],null,2);
-        // Calling the end function will send the request
-      });
-  })();
-  </script></body>
+    (function () {
+      // superagent is exposed as `window.superagent`
+      // if you wish to use "request" instead please
+      // uncomment the following line of code:
+      // `window.request = superagent;`
+      superagent
+        .get('users')
+        .set('X-API-Key', 'foobar')
+        .then(function (res) {
+          const htmlTable_prefix = `<table border='1' style='width:100%;border-width:1px;border-color:black;'>
+          <tr>
+            <th>UID</th>
+            <th>Email</th>
+            <th>Verified</th>
+            <th>Disabled</th>
+            <th>Creation Time</th>
+            <th>Last Sign In</th>
+            <th>Providers</th>
+            <th>Actions</th>
+          </tr>
+        `;
+          const htmlTable_suffix = `</table>`;
+          const htmlTable_data = res.body.map((user) => {
+            return `<tr>
+              <td>${user.uid}</td>
+              <td>${user.email}</td>
+              <td>${user.emailVerified ? 'V' : 'X'}</td>
+              <td>${user.disabled ? 'V' : ''}</td>
+              <td>${new Date(user.metadata.creationTime).toISOString().replace('T', ' ').replace('.000Z', '')}</td>
+              <td>${new Date(user.metadata.lastSignInTime).toISOString().replace('T', ' ').replace('.000Z', '')}</td>
+              <td>${user.providerData.map((provider, i) => {
+              var prefix = (i == 0) ? '' : '\n';
+              if (provider.providerId === "password") {
+                return prefix + provider.providerId + '\n';
+              } else {
+                return prefix + JSON.stringify(provider, null, 2) + '\n';
+              }
+            })}</td>
+              <td>
+                ${user.emailVerified ? '' : `<button onclick="alert('${user.uid}')">Send verification email</button>`}
+                <button onclick="alert('${user.uid}')">Disable</button>
+                <button onclick="alert('${user.uid}')">Reset password</button>
+                <button onclick="alert('${user.uid}')">Delete</button>
+              </td>
+            </tr>`;
+          }).join('');
+
+          const mainElem = document.getElementById('main');
+          mainElem.innerHTML = htmlTable_prefix + htmlTable_data + htmlTable_suffix;
+        }).catch((err) => {
+          console.error(`ERROR: ${err.stack}`);
+        });
+    })();
+  </script>
+</body>
+
 </html>

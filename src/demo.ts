@@ -45,8 +45,29 @@ process.on('uncaughtException', err => {
 
 console.log('WEB SERVER - STARTED!');
 
-const fb_secrets = JSON.parse(process.env.FB_SECRETS || '{}');
-if (!Object.keys(fb_secrets).length) {
+var fb_secrets = {
+  project_id: '',
+  private_key_id: '',
+  private_key: '',
+  client_email: '',
+  client_id: '',
+  client_x509_cert_url: '',
+  databaseURL: '',
+};
+
+if (process.env.FB_SECRETS) {
+  fb_secrets = JSON.parse(process.env.FB_SECRETS);
+} else {
+  fb_secrets.project_id = process.env.PROJECT_ID || '';
+  fb_secrets.private_key_id = process.env.PRIVATE_KEY_ID || '';
+  fb_secrets.private_key = process.env.PRIVATE_KEY || '';
+  fb_secrets.client_email = process.env.CLIENT_EMAIL || '';
+  fb_secrets.client_id = process.env.CLIENT_ID || '';
+  fb_secrets.client_x509_cert_url = process.env.CLIENT_X509_CERT_URL || '';
+  fb_secrets.databaseURL = process.env.DATABASEURL || '';
+}
+
+if (!fb_secrets.project_id) {
   throw new Error('Environment variable is missing!');
 }
 
@@ -65,7 +86,7 @@ const serviceAccount: object = {
 
 const firebaseInstance = FB_admin.initializeApp({
   credential: FB_admin.credential.cert(serviceAccount),
-  databaseURL: 'https://apiprofit-dashboard.firebaseio.com' || fb_secrets.databaseURL,
+  databaseURL: fb_secrets.databaseURL,
 });
 
 const app = express()
