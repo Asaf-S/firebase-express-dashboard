@@ -50,6 +50,8 @@ Then navigate to either of the following to see the dashboard's UI:
 http://localhost:5000/firebaseDashboard (if the port for development is 5000)
 https://your_domain.com/firebaseDashboard
 
+The dashboard's UI can be also be embedded in other websites using an iframe.
+
 # Need help with the development of:
 
 - Better UI (React.js cannot be placed in a sub-folder without knowing the sub-folder's name during the build time, if someone can solve this somehow it can help the UI a lot).
