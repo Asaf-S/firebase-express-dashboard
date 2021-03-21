@@ -15,6 +15,6 @@ export default function (firebase: FirebaseAdmin.app.App, options?: { middleware
   try {
     return createRoutes(firebaseDashboard);
   } catch (err) {
-    throw new Error('No middleware available for ' + options.middleware);
+    throw new Error('No middleware available for ' + options.middleware + `\nError: ${err.stack}`);
   }
 }

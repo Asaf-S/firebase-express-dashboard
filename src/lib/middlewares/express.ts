@@ -9,7 +9,6 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
   router.use(express.json());
   router.use(express.urlencoded({ extended: false }));
 
-  router.get('/', express.static(path.join(__dirname, '../../public')));
   router.get('/users', (req, res) => {
     firebaseDashboard
       .listUsers()
@@ -27,6 +26,7 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
     //   return res.status(500).json(err);
     // });
   });
+  router.use('/', express.static(path.join(__dirname, '../../public')));
 
   return router;
 }

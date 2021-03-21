@@ -4,14 +4,21 @@
   "description": "",
   "main": "./dist/index.js",
   "scripts": {
-    "test": "rimraf ./dist && jest --forceExit",
+    "task:clean": "rimraf ./dist",
+    "task:typescript": "tsc -sourcemap",
+    "task:static": "shx cp -R ./src/public ./dist",
+    "task:tslint": "tslint -c tslint.json -p tsconfig.json --fix",
+    "task:jest": "jest --forceExit",
+    "task:build_FE": "cd src_front_end && npm run build",
+    "task:static_FE": "shx cp -R ./src_front_end/public ./dist",
+
+    "test": "npm-run-all task:clean task:jest",
     "publish": "np",
     "prepare": "husky install",
-    "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
     "prestart": "npm run build",
-    "build": "rimraf dist && tsc -sourcemap",
-    "postbuild": "shx cp -R ./src/public ./dist",
-    "start": "node -r source-map-support/register dist/demo.js"
+    "build": "npm-run-all task:clean task:tslint task:typescript task:static task:build_FE task:static_FE",
+    "start": "node -r source-map-support/register dist/demo.js",
+    "install": "cd src_front_end && npm install --legacy-peer-deps"
   },
   "bugs": {
     "url": "https://github.com/Asaf-S/firebase-express-dashboard/issues"
@@ -37,6 +44,7 @@
     "jest": "^26.6.3",
     "lint-staged": "^10.5.4",
     "np": "^7.4.0",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
     "shx": "^0.3.3",
