@@ -11,13 +11,13 @@ export default class FirebaseDashboard {
     if (firebase) {
       this.firebase = firebase;
     } else {
-      throw new Error('Wrong param!');
+      throw new Error('Error: Input missing! Please provide a firebase app instance...');
     }
   }
 
   async listUsers(): Promise<object[]> {
     const userList: object[] = [];
-    let nextPageToken: string | undefined = undefined;
+    let nextPageToken: string | undefined;
 
     do {
       await this.firebase

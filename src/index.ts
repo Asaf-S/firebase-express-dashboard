@@ -1,9 +1,11 @@
 'use strict';
 import path from 'path';
+import express from 'express';
 import * as FirebaseAdmin from 'firebase-admin';
 import FirebaseDashboard from './lib/FirebaseDashboard';
+import createRoutes from './lib/middlewares/express';
 
-export default function (firebase: FirebaseAdmin.app.App, options: { middleware?: any; }) {
+export default function (firebase: FirebaseAdmin.app.App, options?: { middleware?: any }): express.Router {
   options = options || {};
   if (!options.middleware) {
     options.middleware = 'express';
@@ -12,9 +14,8 @@ export default function (firebase: FirebaseAdmin.app.App, options: { middleware?
   const firebaseDashboard = new FirebaseDashboard(firebase, options);
 
   try {
-    const middlewarePath = path.join(__dirname, 'lib/middlewares', options.middleware);
-    return require(middlewarePath)(firebaseDashboard);
+    return createRoutes(firebaseDashboard);
   } catch (err) {
     throw new Error('No middleware available for ' + options.middleware);
   }
-};
+}
