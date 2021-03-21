@@ -1,3 +1,23 @@
 <html>
-  <body>Hello World!</body>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/superagent"></script>
+  </head>
+  <body>Hello World!<br>
+  <div id="main"></div>
+  <script>
+    (function() {
+    // superagent is exposed as `window.superagent`
+    // if you wish to use "request" instead please
+    // uncomment the following line of code:
+    // `window.request = superagent;`
+    superagent
+      .get('users')
+      .set('X-API-Key', 'foobar')
+      .end(function (err, res) {
+        const mainElem = document.getElementById('main');
+        mainElem.innerText = JSON.stringify(res.body || [],null,2);
+        // Calling the end function will send the request
+      });
+  })();
+  </script></body>
 </html>
