@@ -2,7 +2,8 @@
   "name": "firebase-express-dashboard",
   "version": "0.2.1",
   "description": "",
-  "main": "./dist/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "task:clean": "rimraf ./dist",
     "task:typescript": "tsc -sourcemap",
