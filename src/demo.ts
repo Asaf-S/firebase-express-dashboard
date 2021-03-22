@@ -45,7 +45,7 @@ process.on('uncaughtException', err => {
 
 console.log('WEB SERVER - STARTED!');
 
-var fb_secrets = {
+let fb_secrets = {
   project_id: '',
   private_key_id: '',
   private_key: '',
