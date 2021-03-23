@@ -36,13 +36,16 @@
         `;
           const htmlTable_suffix = `</table>`;
           const htmlTable_data = res.body.map((user) => {
+            const lastSignInTime_Date = new Date(user.metadata.lastSignInTime);
+            const lastSignInTime_String = lastSignInTime_Date.getTime() ? lastSignInTime_Date.toISOString().replace('T', ' ').replace('.000Z', '') : "Never";
+
             return `<tr>
               <td>${user.uid}</td>
               <td>${user.email}</td>
               <td>${user.emailVerified ? 'V' : 'X'}</td>
               <td>${user.disabled ? 'V' : ''}</td>
               <td>${new Date(user.metadata.creationTime).toISOString().replace('T', ' ').replace('.000Z', '')}</td>
-              <td>${new Date(user.metadata.lastSignInTime).toISOString().replace('T', ' ').replace('.000Z', '')}</td>
+              <td>${lastSignInTime_String}</td>
               <td>${user.providerData.map((provider, i) => {
               var prefix = (i == 0) ? '' : '\n';
               if (provider.providerId === "password") {
