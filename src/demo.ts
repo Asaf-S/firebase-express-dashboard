@@ -4,7 +4,7 @@ import path from 'path';
 import json_stringify_safe from 'json-stringify-safe';
 import FB_admin from 'firebase-admin';
 
-import fbdash from './index';
+import firebasedashboard from './index';
 
 const PORT = process.env.PORT || 5000;
 
@@ -100,7 +100,7 @@ const app = express()
   )
 
   // API routes
-  .use('/fbdash', fbdash(firebaseInstance))
+  .use('/firebasedashboard', firebasedashboard(firebaseInstance))
 
   // Wildcard
   .all('*', (req, res) => {
