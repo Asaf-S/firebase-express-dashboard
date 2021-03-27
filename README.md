@@ -4,7 +4,7 @@ Add CRUD routes that manage Firebase Auth to Expess.js.
 
 Also, it exposes a dashboard to manage it all.
 
-See !['src/demo.ts'](https://github.com/Asaf-S/firebase-express-dashboard/blob/main/src/demo.ts) file to see how to better integrate it into your project.
+See ['src/demo.ts'](https://github.com/Asaf-S/firebase-express-dashboard/blob/main/src/demo.ts) file to see how to better integrate it into your project.
 
 ![Dashboard](./screenshot.png)
 
