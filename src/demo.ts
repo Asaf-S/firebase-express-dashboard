@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import path from 'path';
 import json_stringify_safe from 'json-stringify-safe';
 import FB_admin from 'firebase-admin';
 
@@ -89,7 +88,7 @@ const firebaseInstance = FB_admin.initializeApp({
   databaseURL: fb_secrets.databaseURL,
 });
 
-function manuallyCheckPermissions(req: express.Request, res: express.Response, next: express.NextFunction) {
+function manuallyCheckPermissions(req: express.Request, res: express.Response, next: express.NextFunction): any {
   if (process.env.NODE_ENV !== 'production' || req.header('Authorization') === 'Bearer ExpectedTokenOfAdmin') {
     return next();
   } else {
@@ -115,10 +114,10 @@ const app = express()
   .use('/firebasedashboard', manuallyCheckPermissions, firebasedashboard(firebaseInstance, FB_options))
 
   // Wildcard
-  .all('*', (req, res) => {
+  .all('*', (req: express.Request, res: express.Response) => {
     const msg = 'Express - Wildcard was caught!';
     console.error(msg);
-    res.sendStatus(404);
+    return res.sendStatus(404);
   });
 
 app.listen(PORT, () => console.log(`Express - Listening on ${PORT}\nhttp://localhost:${PORT}`));

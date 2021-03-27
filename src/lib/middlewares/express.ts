@@ -46,7 +46,7 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
     //   console.log('Error creating new user:', error);
     // });
   });
-  router.use('/', express.static(path.join(__dirname, '../../public')));
+  router.use(express.static(path.join(__dirname, '../../public')));
 
   return router;
 }
