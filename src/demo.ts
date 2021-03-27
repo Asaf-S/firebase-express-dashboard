@@ -89,6 +89,18 @@ const firebaseInstance = FB_admin.initializeApp({
   databaseURL: fb_secrets.databaseURL,
 });
 
+function manuallyCheckPermissions(req: express.Request, res: express.Response, next: express.NextFunction) {
+  if (process.env.NODE_ENV !== 'production' || req.header('Authorization') === 'Bearer ExpectedTokenOfAdmin') {
+    return next();
+  } else {
+    return res.sendStatus(403);
+  }
+}
+
+const FB_options = {
+  werePermissionsTakenCareOf: true, // This should be set to 'true' only when the permissions are actually taken care of and are tested
+};
+
 const app = express()
   // Middlewares
   .use(cors())
@@ -100,7 +112,7 @@ const app = express()
   )
 
   // API routes
-  .use('/firebasedashboard', firebasedashboard(firebaseInstance))
+  .use('/firebasedashboard', manuallyCheckPermissions, firebasedashboard(firebaseInstance, FB_options))
 
   // Wildcard
   .all('*', (req, res) => {

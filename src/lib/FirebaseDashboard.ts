@@ -1,15 +1,17 @@
 'use strict';
 import * as FirebaseAdmin from 'firebase-admin';
+import { IOptions } from '../index';
 
 // Docs: https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
 
 const PAGING_RESULTS_IN_ONE_PAGE = 1000;
 
 export default class FirebaseDashboard {
-  firebase: FirebaseAdmin.app.App;
+  private firebase: FirebaseAdmin.app.App;
+  private options: IOptions;
 
-  constructor(firebase: FirebaseAdmin.app.App, options: {}) {
-    options = options || {};
+  constructor(firebase: FirebaseAdmin.app.App, options: IOptions) {
+    this.options = options;
     if (firebase) {
       this.firebase = firebase;
     } else {
@@ -21,10 +23,11 @@ export default class FirebaseDashboard {
     const userList: object[] = [];
     let nextPageToken: string | undefined;
 
+    // TODO: support paging
     do {
       await this.firebase
         .auth()
-        .listUsers(PAGING_RESULTS_IN_ONE_PAGE, nextPageToken)
+        .listUsers(this.options.recordsPerPageInUserList, nextPageToken)
         .then(listUsersResult => {
           listUsersResult.users.forEach((userRecord: FirebaseAdmin.auth.UserRecord) => {
             userList.push(userRecord.toJSON());
