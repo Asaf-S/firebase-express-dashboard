@@ -4,12 +4,16 @@ Add CRUD routes that manage Firebase Auth to Expess.js.
 
 Also, it exposes a dashboard to manage it all.
 
+See !['src/demo.ts'](https://github.com/Asaf-S/firebase-express-dashboard/blob/main/src/demo.ts) file to see how to better integrate it into your project.
+
 ![Dashboard](./screenshot.png)
 
 ```javascript
+import express from 'express';
+import FB_admin from 'firebase-admin';
 import firebaseDashboard from 'firebase-express-dashboard';
 
-const serviceAccount: object = {
+const serviceAccount = {
   type: 'service_account',
   project_id: process.env.PROJECT_ID,
   private_key_id: process.env.PRIVATE_KEY_ID,
@@ -27,26 +31,9 @@ const firebaseInstance = FB_admin.initializeApp({
   databaseURL: process.env.DATABASEURL,
 });
 
-const app = express()
-  // Middlewares
-  .use(express.json())
-  .use(
-    express.urlencoded({
-      extended: true,
-    })
-  )
-
-  // API routes
+express()
   .use('/firebaseDashboard', firebaseDashboard(firebaseInstance))
-
-  // Wildcard
-  .all('*', (req, res) => {
-    const msg = 'Express - Wildcard was caught!';
-    console.error(msg);
-    res.sendStatus(404);
-  });
-
-app.listen(PORT, () => console.log(`Express - Listening on ${PORT}`));
+  .listen(PORT, () => console.log(`Express - Listening on ${PORT}`));
 ```
 
 Then navigate to either of the following to see the dashboard's UI:
