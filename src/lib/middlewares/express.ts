@@ -19,6 +19,7 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
         return res.status(500).json(err);
       });
   });
+
   router.delete('/users/:userUID', (req, res) => {
     // firebaseDashboard.listUsers().then(userList => {
     //   return res.json(userList);
@@ -26,6 +27,7 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
     //   return res.status(500).json(err);
     // });
   });
+
   router.post('users/new', (req, res) => {
     // admin
     // .auth()
@@ -46,6 +48,23 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
     //   console.log('Error creating new user:', error);
     // });
   });
+
+  router.post('/resetpassword', (req, res) => {
+    return firebaseDashboard
+      .resetPassword(req.body.email)
+      .then(isSuccessful => {
+        return res.json({
+          isSuccessful,
+        });
+      })
+      .catch(err => {
+        return res.json({
+          isSuccessful: false,
+          reason: err.stack,
+        });
+      });
+  });
+
   router.use(express.static(path.join(__dirname, '../../public')));
 
   return router;

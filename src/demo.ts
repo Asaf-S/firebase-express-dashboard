@@ -4,6 +4,7 @@ import json_stringify_safe from 'json-stringify-safe';
 import FB_admin from 'firebase-admin';
 
 import firebasedashboard from './index';
+import { IOptions } from './lib/FirebaseDashboard';
 
 const PORT = process.env.PORT || 5000;
 
@@ -96,8 +97,9 @@ function manuallyCheckPermissions(req: express.Request, res: express.Response, n
   }
 }
 
-const FB_options = {
+const FB_options: IOptions = {
   werePermissionsTakenCareOf: true, // This should be set to 'true' only when the permissions are actually taken care of and are tested
+  webAPI: process.env.FIREBASE_WEB_API || '', // This allows making some more actions like Reset password, etc.
 };
 
 const app = express()

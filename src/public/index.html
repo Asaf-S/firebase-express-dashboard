@@ -13,14 +13,33 @@
   </div>
   <div id="main">Loading...</div>
   <script>
+
+    function reset_password(email) {
+      const url = 'resetpassword';
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      const body = {
+        email,
+      };
+
+      return superagent
+        .post(url)
+        .set(headers)
+        .send(JSON.stringify(body))
+        .then(res => {
+          if(res && res.body && res.body.isSuccessful) {
+            alert(`Password-reset email was sent!`);
+          } else {
+            alert(`Failed to send password-reset email!`);
+          }
+        })
+    }
+
     (function () {
-      // superagent is exposed as `window.superagent`
-      // if you wish to use "request" instead please
-      // uncomment the following line of code:
-      // `window.request = superagent;`
       superagent
         .get('users')
-        .set('X-API-Key', 'foobar')
+        // .set('X-API-Key', 'foobar')
         .then(function (res) {
           const htmlTable_prefix = `<table border='1' style='width:100%;border-width:1px;border-color:black;'>
           <tr style='background: lightgray'>
@@ -57,7 +76,7 @@
               <td>
                 ${user.emailVerified ? '' : `<button onclick="alert('${user.uid}')">Send verification email</button>`}
                 <button onclick="alert('${user.uid}')">Disable</button>
-                <button onclick="alert('${user.uid}')">Reset password</button>
+                <button onclick="reset_password('${user.email}')">Reset password</button>
                 <button onclick="alert('${user.uid}')">Delete</button>
               </td>
             </tr>`;
