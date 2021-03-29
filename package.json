@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "files": [
     "dist/**/*",
-    "!dist/demo*"
+    "!dist/demo*",
+    ".np-config.json"
   ],
   "scripts": {
     "task:clean": "rimraf ./dist",
