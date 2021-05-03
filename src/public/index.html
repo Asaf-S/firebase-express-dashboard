@@ -8,40 +8,29 @@
   <div style="display: flex; " >
     <h1 style="margin-right: 30px;">Users</h1>
     <div style="display: flex; align-items: center;">
-      <button onclick="alert('Will be developed soon!')">Create new user</button>
+      <button onclick="createNewUser()">Create new user</button>
     </div>
   </div>
   <div id="main">Loading...</div>
   <script>
 
-    function reset_password(email) {
-      if(confirm("Send a reset-password email to the user's email?")) {
-        const url = 'resetpassword';
-        const headers = {
-          'Content-Type': 'application/json'
-        };
-        const body = {
-          email,
-        };
+    const mainElement = document.getElementById('main');
 
-        return superagent
-          .post(url)
-          .set(headers)
-          .send(JSON.stringify(body))
-          .then(res => {
-            if(res && res.body && res.body.isSuccessful) {
-              alert(`Password-reset email was sent!`);
-            } else {
-              alert(`Failed to send password-reset email!`);
-            }
-          });
-      }
+    function postToServer(url, body) {
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+
+      return superagent
+        .post(url)
+        .set(headers)
+        .send(JSON.stringify(body));del
     }
 
-    (function () {
-      superagent
+    function refreshUserList() {
+      mainElement.innerHTML=`Loading...`;
+      return superagent
         .get('users')
-        // .set('X-API-Key', 'foobar')
         .then(function (res) {
           const htmlTable_prefix = `<table border='1' style='width:100%;border-width:1px;border-color:black;'>
           <tr style='background: lightgray'>
@@ -79,17 +68,67 @@
                 ${user.emailVerified ? '' : `<button onclick="alert('${user.uid}')">Send verification email</button>`}
                 <button onclick="alert('${user.uid}')">Disable</button>
                 <button onclick="reset_password('${user.email}')">Reset password</button>
-                <button onclick="alert('${user.uid}')">Delete</button>
+                <button onclick="deleteUser('${user.uid}')">Delete</button>
               </td>
             </tr>`;
           }).join('');
 
-          const mainElem = document.getElementById('main');
-          mainElem.innerHTML = htmlTable_prefix + htmlTable_data + htmlTable_suffix;
+          mainElement.innerHTML = htmlTable_prefix + htmlTable_data + htmlTable_suffix;
         }).catch((err) => {
           console.error(`ERROR: ${err.stack}`);
         });
-    })();
+    }
+
+    function createNewUser() {
+      const email = prompt("Please enter an email address:");
+      if (email) {
+        postToServer('users/new', { email }).then(res => {
+          if(res.body.isSuccessful) {
+            console.log(`Email: ${email}\nUser ID: ${res.body.userID}`);
+            alert('New user successfully created!');
+          } else {
+            alert(`Error!\nReason: ${res.body.reason}`);
+          }
+          refreshUserList();
+        });
+      } else {
+        console.log(`Email=${email} (${typeof(email)})`);
+      }
+    }
+
+    function reset_password(email) {
+      if(confirm("Send a reset-password email to the user's email?")) {
+
+        postToServer('resetpassword', { email }).then(res => {
+          if(res && res.body && res.body.isSuccessful) {
+            alert(`Password-reset email was sent!`);
+          } else {
+            alert(`Failed to send password-reset email!`);
+          }
+        });
+      }
+    }
+
+    function deleteUser(uid) {
+      if(uid && confirm("Are you sure you want to DELETE this user?")) {
+
+        return superagent
+          .del(`users/${uid}`)
+          // .set(headers)
+          // .send(JSON.stringify(body))
+          .then(res => {
+            if(res.body.isSuccessful) {
+              console.log(`Deleted user ID: ${res.body.userID}`);
+              alert('The user was successfully deleted!');
+            } else {
+              alert(`Error!\nReason: ${res.body.reason}`);
+            }
+            refreshUserList();
+          });
+      }
+    }
+
+    refreshUserList();
   </script>
 </body>
 

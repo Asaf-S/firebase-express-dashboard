@@ -7,6 +7,7 @@ import firebasedashboard from './index';
 import { IOptions } from './lib/FirebaseDashboard';
 
 const PORT = process.env.PORT || 5000;
+const ROUTE_PATH = '/firebasedashboard';
 
 function convertToString(value: any) {
   const isError = (obj: any) => {
@@ -113,13 +114,13 @@ const app = express()
   )
 
   // API routes
-  .use('/firebasedashboard', manuallyCheckPermissions, firebasedashboard(firebaseInstance, FB_options))
+  .use(ROUTE_PATH, manuallyCheckPermissions, firebasedashboard(firebaseInstance, FB_options))
 
   // Wildcard
   .all('*', (req: express.Request, res: express.Response) => {
     const msg = 'Express - Wildcard was caught!';
-    console.error(msg);
+    console.error(msg + ' ' + req.path);
     return res.sendStatus(404);
   });
 
-app.listen(PORT, () => console.log(`Express - Listening on ${PORT}\nhttp://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`Express - Listening on ${PORT}\nhttp://localhost:${PORT}${ROUTE_PATH}`));

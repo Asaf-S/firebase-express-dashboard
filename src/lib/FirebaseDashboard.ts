@@ -74,24 +74,44 @@ export default class FirebaseDashboard {
 
   async createUser(
     email: string,
-    password: string,
+    password: string = '',
     displayName: string = '',
     photoURL: string = ''
   ): Promise<FirebaseAdmin.auth.UserRecord> {
-    const details: { [key: string]: string } = {};
+    const details: { [key: string]: string } = {
+      //   email: 'user@example.com',
+      //   emailVerified: false,
+      //   phoneNumber: '+11234567890',
+      //   password: 'secretPassword',
+      //   displayName: 'John Doe',
+      //   photoURL: 'http://www.example.com/12345678/photo.png',
+      //   disabled: false,
+    };
+    let shouldResetPasswordEmailBeSent: boolean = false;
+
     details.email = email;
-    details.password = password;
+    if (password) {
+      details.password = password;
+    } else {
+      shouldResetPasswordEmailBeSent = true;
+    }
     if (displayName) {
       details.displayName = displayName;
     }
     if (photoURL) {
-      details.photoURL = 'http://www.example.com/12345678/photo.png';
+      details.photoURL = photoURL; // E.g. 'http://www.example.com/12345678/photo.png'
     }
 
     const userRecord = await this.firebase.auth().createUser(details);
-    // TODO: Send verification email?
-    // TODO: #1 Send reset password email?
     console.log('Successfully created new user:', userRecord.uid);
+
+    if (shouldResetPasswordEmailBeSent) {
+      console.log('Sending a reset-password email to the new user');
+      await this.resetPassword(email);
+    }
+
+    // TODO: Send verification email if password was received?
+
     return userRecord;
   }
 
@@ -129,13 +149,13 @@ export default class FirebaseDashboard {
 
   async deleteUser(uid: string): Promise<void> {
     await this.firebase.auth().deleteUser(uid);
-    console.log('Successfully deleted user');
+    console.log(`Successfully deleted user: ${uid}`);
   }
 
   async updateCustomClaims(uid: string, claims: object): Promise<void> {
     // The new custom claims will propagate to the user's ID token the
     // next time a new one is issued.
     await this.firebase.auth().setCustomUserClaims(uid, claims); // claims example: { admin: true }
-    console.log('Successfully updated the custom claims to user');
+    console.log(`Successfully updated the custom claims to user ${uid}`);
   }
 }
