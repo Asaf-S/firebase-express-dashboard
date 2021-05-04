@@ -10,11 +10,15 @@
     <div style="display: flex; align-items: center;">
       <button onclick="createNewUser()">Create new user</button>
     </div>
+    <div style="width:100px"></div>
+    <h1 style="align-self: flex-end;" id="project_id">Loading...</h1>
   </div>
   <div id="main">Loading...</div>
   <script>
 
     const mainElement = document.getElementById('main');
+    const projectIdElement = document.getElementById('project_id');
+
 
     function postToServer(url, body) {
       const headers = {
@@ -128,6 +132,26 @@
       }
     }
 
+    function getProjectId() {
+
+      projectIdElement.innerHTML=`Loading...`;
+      return superagent
+        .get('projectID')
+        .then(function (res) {
+          if(res.body.isSuccessful) {
+            projectIdElement.innerHTML=res.body.projectID;
+          } else {
+            console.error(`Error!\nReason: ${res.body.projectID}`);
+            projectIdElement.innerHTML="Project ID: Unknown";
+          }
+        })
+        .catch(e=>{
+          console.error(`Error!\nReason: ${e.stack}`);
+          projectIdElement.innerHTML="Project ID: Error";
+        });
+    }
+
+    getProjectId();
     refreshUserList();
   </script>
 </body>

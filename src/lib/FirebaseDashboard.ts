@@ -51,6 +51,14 @@ export default class FirebaseDashboard {
     }
   }
 
+  getProjectID(): string {
+    return (
+      this.firebase.options.projectId ||
+      ((this.firebase.options.credential as unknown) as { projectId: string })?.projectId ||
+      ''
+    );
+  }
+
   async listUsers(): Promise<object[]> {
     const userList: object[] = [];
     let nextPageToken: string | undefined;
