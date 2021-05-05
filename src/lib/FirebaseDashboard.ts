@@ -164,6 +164,8 @@ export default class FirebaseDashboard {
     // The new custom claims will propagate to the user's ID token the
     // next time a new one is issued.
     await this.firebase.auth().setCustomUserClaims(uid, claims); // claims example: { admin: true }
-    console.log(`Successfully updated the custom claims to user ${uid}`);
+    console.log(
+      `Successfully updated the following custom claims to user ${uid}:\n${claims && JSON.stringify(claims, null, 2)}`
+    );
   }
 }

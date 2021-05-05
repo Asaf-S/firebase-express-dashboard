@@ -70,7 +70,8 @@
             })}</td>
               <td>
                 ${user.emailVerified ? '' : `<button onclick="alert('${user.uid}')">Send verification email</button>`}
-                <button onclick="alert('${user.uid}')">Disable</button>
+                <button onclick="alert('Under development ${user.uid}')">Claims</button>
+                <button onclick="alert('Under development ${user.uid}')">Disable</button>
                 <button onclick="reset_password('${user.email}')">Reset password</button>
                 <button onclick="deleteUser('${user.uid}')">Delete</button>
               </td>
@@ -107,6 +108,7 @@
           if(res && res.body && res.body.isSuccessful) {
             alert(`Password-reset email was sent!`);
           } else {
+            console.error(`Error!\nReason: ${res.body.reason}`);
             alert(`Failed to send password-reset email!`);
           }
         });
@@ -130,6 +132,19 @@
             refreshUserList();
           });
       }
+    }
+
+    function updateClaims(uid) {
+
+      postToServer(`users/${uid}`, { admin: 1 }).then(res => {
+        if(res && res.body && res.body.isSuccessful) {
+          console.log(`Claims were updated!`);
+        } else {
+          const err1 = `Failed to update claims!`;
+          console.error(err1);
+          alert(err1);
+        }
+      });
     }
 
     function getProjectId() {
