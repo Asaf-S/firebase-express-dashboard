@@ -171,6 +171,11 @@ export default class FirebaseDashboard {
     console.log(`Successfully deleted user: ${uid}`);
   }
 
+  async getClaims(uid: string): Promise<{ [key: string]: any } | undefined | null> {
+    const user = await this.firebase.auth().getUser(uid);
+    return user.customClaims;
+  }
+
   async updateCustomClaims(uid: string, claims: object): Promise<void> {
     // The new custom claims will propagate to the user's ID token the
     // next time a new one is issued.

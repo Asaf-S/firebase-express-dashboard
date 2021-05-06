@@ -37,24 +37,26 @@
       return superagent
         .get('users')
         .then(function (res) {
-          const htmlTable_prefix = `<table border='1' style='width:100%;border-width:1px;border-color:black;'>
-          <tr style='background: lightgray'>
-            <th>UID</th>
-            <th>Email</th>
-            <th>Verified</th>
-            <th>Disabled</th>
-            <th>Creation Time</th>
-            <th>Last Sign In</th>
-            <th>Providers</th>
-            <th>Actions</th>
-          </tr>
-        `;
-          const htmlTable_suffix = `</table>`;
+          const htmlTable_prefix = `
+          <table border='1' style='width:100%;border-width:1px;border-color:black;'>
+            <tr style='background: lightgray'>
+              <th>UID</th>
+              <th>Email</th>
+              <th>Verified</th>
+              <th>Disabled</th>
+              <th>Creation Time</th>
+              <th>Last Sign In</th>
+              <th>Providers</th>
+              <th>Claims</th>
+              <th>Actions</th>
+            </tr>
+          `;
           const htmlTable_data = res.body.map((user) => {
             const lastSignInTime_Date = new Date(user.metadata.lastSignInTime);
             const lastSignInTime_String = lastSignInTime_Date.getTime() ? lastSignInTime_Date.toISOString().replace('T', ' ').replace('.000Z', '') : "Never";
 
-            return `<tr>
+            return `
+            <tr>
               <td>${user.uid}</td>
               <td>${user.email}</td>
               <td>${user.emailVerified ? 'V' : 'X'}</td>
@@ -62,22 +64,29 @@
               <td>${new Date(user.metadata.creationTime).toISOString().replace('T', ' ').replace('.000Z', '')}</td>
               <td>${lastSignInTime_String}</td>
               <td>${user.providerData.map((provider, i) => {
-              var prefix = (i == 0) ? '' : '\n';
-              if (provider.providerId === "password") {
-                return prefix + provider.providerId + '\n';
-              } else {
-                return prefix + JSON.stringify(provider, null, 2) + '\n';
-              }
-            })}</td>
+                var prefix = (i == 0) ? '' : '\n';
+                if (provider.providerId === "password") {
+                  return prefix + provider.providerId + '\n';
+                } else {
+                  return prefix + JSON.stringify(provider, null, 2) + '\n';
+                }
+              })}</td>
+              <td style="text-align: center;">
+                <img
+                  onclick="showClaims('${user.uid}')"
+                  style="cursor: pointer; width: 15px; height: 15px"
+                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAIAAADajyQQAAAACXBIWXMAABYlAAAWJQFJUiTwAAAEIUlEQVRo3u1bv267MBB2UTf6AEhVxc6A2JDaDhncrUNXHqBbxTvwAF1C905eMrUDUzNkIJXYIgZWhKpIUWYzgcRvyE9typk/iSEBmttKUnKf77vPZ/t8lmUZatTiOF4sFlEUeZ4XBMF0OmV+DWOsKIqu67Isa5omimKzbqCsIQvD0LZtVVX3c0NVVdu2wzBsyh9eYJRSHjxFCCmlRwNGKbUsC7VmlmXxwNsHWJIkrULKwUuS5BDAHMeRJAkd0CRJchxnVz/P6qtiHMcPDw9FKgdTZTQabUTv8vIy9+lyudzI5mw2832/zgsxxm9vbzuIZ80B8H2/TqBM03Rdd6fcoJS6rmuaZp3Q+b7fJBUdx6n8SUIIp5RRSgkhlcNXk5bVwCp1ghCyX34XKRMhpFJReIGVo+JUZJ65pBIb2g+Vqqrr9Tpr2dbrdcnUX44N7ZFXGOMGuVfJTIzxHvmGijSQh9+NWwl3inQSMfldJE2u62ZHMtd1iwSZmecMYEWhPyKqcmwY42pgRal1FAbW5yRMNpTLVCYJmUOy68xrGIZhGPxLEiahJEnK6RmqHA9VVXk0MAxD+E6eBWWSJMw5IMcptD2uzChzzlfMAVZVlXN+Y7q6zQVUHi7+1CqSac6ZsNJbVB6uBpbo7QCrdFjY/P36+sqsbvk3j4qoeH5+zvNaURSZtfIPkA0+mI5QZzoiHuUa/p29qOi3CSENluqEEMuyTNPkX7ZtGzNom1FDWZbZtt1Gdh3AmJlm2/Z/YJCHpmlmPTG4p7Bh4xml9OLiApaFNzc3jewxvby8fH5+5h5eX18/PT018v75fH57ewvphpiVZYM8NAwDvt8wjFbZ6LquEEURDGXzRwStmSiKMJWiKBI8z8s9HY1GqFcGHfY8TwiCIPdU1/V+AYMOB0EgwJ1dWZb7BQw6PJ1OBfg9uCPdcWM6LKCB2gnYCdgJ2MGBLZfLfmFgOizAFS4ssjpu0GGMsaAoCqxH+gUMOqwoigDrkdls1i9g0GFd1wVYj/i+H8dxX1DFcQzPhmRZFjRNg99eLBZ9AcZ0VdM0gbmemUwmfQEGXd2sJwWE0OPjY+6z8XjcCzbGcTwej3MPN3AEhND9/T38n/f39+4DYzr5H07bG6bt7XmUb5gK2+HbttVq1fFMm0wmq9WKycOfiLV3KNFSxOoeSoiiyDyYeX5+7ma4mI5ZlvWzv9b2wV8bEatz8PdT3RcFDWOcpml3YpWmKfNo6le4EPrVr5im6dXVFcxIjPHHx8d+fsznc1h9y7K89xb63d0d3FmTJOnr6+vXmdufaIcYcgPLkFuOBtskNuS2viE3Yg65dXbIzc6V+fYtTf1rT//WyX5dKPjzV0C2admLSzuna1a7KzI/pENfjMvBG9pVRti+16nLpzuoYn3x7MJ14X9TxDxp9ACuUgAAAABJRU5ErkJggg==">
+              </td>
               <td>
                 ${user.emailVerified ? '' : `<button onclick="alert('${user.uid}')">Send verification email</button>`}
-                <button onclick="alert('Under development ${user.uid}')">Claims</button>
+                <button onclick="alert('Under development ${user.uid}')">Set claims</button>
                 <button onclick="alert('Under development ${user.uid}')">Disable</button>
                 <button class="dependantOnWebAPI" onclick="reset_password('${user.email}')">Reset password</button>
                 <button onclick="deleteUser('${user.uid}')">Delete</button>
               </td>
             </tr>`;
           }).join('');
+          const htmlTable_suffix = `</table>`;
 
           mainElement.innerHTML = htmlTable_prefix + htmlTable_data + htmlTable_suffix;
 
@@ -139,6 +148,23 @@
             refreshUserList();
           });
       }
+    }
+
+    function showClaims(uid) {
+      return superagent
+        .get(`users/${uid}/claims`)
+        .then(function (res) {
+          if(res.body.isSuccessful) {
+            const claims = res.body.claims;
+            if(claims) {
+              alert(JSON.stringify(claims, null, 2));
+            } else {
+              alert(`The user has no claims!`);
+            }
+          } else {
+            alert(`Error getting the user's claims!`);
+          }
+        });
     }
 
     function updateClaims(uid) {

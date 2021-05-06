@@ -28,6 +28,27 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
       });
   });
 
+  router.get('/users/:userID/claims', async (req, res) => {
+    const userID: string = req.params?.userID;
+
+    try {
+      const claims = await firebaseDashboard.getClaims(userID);
+      console.log(`User with UID '${userID}' has the following claims: ${JSON.stringify(claims, null, 2)}`);
+
+      return res.json({
+        isSuccessful: true,
+        userID,
+        claims,
+      });
+    } catch (err) {
+      console.error(`Error: ${err.stack}`);
+      return res.json({
+        isSuccessful: false,
+        reason: err.message,
+      });
+    }
+  });
+
   router.delete('/users/:userID', async (req, res) => {
     const userID: string = req.params?.userID;
 
