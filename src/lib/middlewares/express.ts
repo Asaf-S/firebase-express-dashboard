@@ -55,7 +55,7 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
     }
   });
 
-  router.post('/users/:userID', async (req, res) => {
+  router.put('/users/:userID', async (req, res) => {
     const userID: string = req.params?.userID;
 
     if (userID) {
@@ -63,13 +63,14 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
         if (req.body.newClaims) {
           // const claims: { [key: string]: string } = req.body.newClaims;
           // Object.keys(claims).forEach()
-          await firebaseDashboard.updateCustomClaims(userID, req.body.claims);
+          await firebaseDashboard.updateCustomClaims(userID, req.body.newClaims);
           console.log(`The claims of user ${userID} was successfully updated!`);
         }
 
         return res.json({
           isSuccessful: true,
           userID,
+          claims: req.body.newClaims,
         });
       } catch (err) {
         console.error(`Error: ${err.stack}`);
@@ -87,29 +88,38 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
   });
 
   router.post('/users/new', async (req, res) => {
-    if (req.body) {
-      if (!req.body.email) {
+    try {
+      if (req.body) {
+        if (!req.body.email) {
+          return res.json({
+            isSuccessful: false,
+            reason: 'Email paramter is missing!',
+          });
+        }
+
+        const newUser = await firebaseDashboard.createUser(
+          req.body.email,
+          req.body.password,
+          req.body.displayName,
+          req.body.photoURL
+        );
+
+        return res.json({
+          isSuccessful: true,
+          userID: newUser.uid,
+        });
+      } else {
         return res.json({
           isSuccessful: false,
-          reason: 'Email paramter is missing!',
+          reason: "Request's body is empty!",
         });
       }
-
-      const newUser = await firebaseDashboard.createUser(
-        req.body.email,
-        req.body.password,
-        req.body.displayName,
-        req.body.photoURL
-      );
-
-      return res.json({
-        isSuccessful: true,
-        userID: newUser.uid,
-      });
-    } else {
+    } catch (err) {
+      const errStr = `Error: ${err.stack}`;
+      console.error(errStr);
       return res.json({
         isSuccessful: false,
-        reason: "Request's body is empty!",
+        reason: errStr,
       });
     }
   });
