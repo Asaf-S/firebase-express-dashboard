@@ -16,6 +16,7 @@
   <div id="main">Loading...</div>
   <script>
 
+    window.shouldResetButtonBeDisabled = true;
     const mainElement = document.getElementById('main');
     const projectIdElement = document.getElementById('project_id');
 
@@ -72,13 +73,19 @@
                 ${user.emailVerified ? '' : `<button onclick="alert('${user.uid}')">Send verification email</button>`}
                 <button onclick="alert('Under development ${user.uid}')">Claims</button>
                 <button onclick="alert('Under development ${user.uid}')">Disable</button>
-                <button onclick="reset_password('${user.email}')">Reset password</button>
+                <button class="dependantOnWebAPI" onclick="reset_password('${user.email}')">Reset password</button>
                 <button onclick="deleteUser('${user.uid}')">Delete</button>
               </td>
             </tr>`;
           }).join('');
 
           mainElement.innerHTML = htmlTable_prefix + htmlTable_data + htmlTable_suffix;
+
+          const buttonsDependantOnWebAPI = document.getElementsByClassName('dependantOnWebAPI');
+          for (var button of buttonsDependantOnWebAPI) {
+            button.disabled = window.shouldResetButtonBeDisabled;
+            button.title = window.shouldResetButtonBeDisabled ? "The webAPI field was not provided to 'firebase-express-dashbard'." : "";
+          }
         }).catch((err) => {
           console.error(`ERROR: ${err.stack}`);
         });
@@ -147,16 +154,17 @@
       });
     }
 
-    function getProjectId() {
+    function getProjectDetails() {
 
       projectIdElement.innerHTML=`Loading...`;
       return superagent
-        .get('projectID')
+        .get('projectDetails')
         .then(function (res) {
-          if(res.body.isSuccessful) {
-            projectIdElement.innerHTML=res.body.projectID;
+          if(res.body.isSuccessful && res.body.projectDetails) {
+            projectIdElement.innerHTML=res.body.projectDetails.projectId;
+            window.shouldResetButtonBeDisabled = res.body.projectDetails.shouldResetButtonBeDisabled;
           } else {
-            console.error(`Error!\nReason: ${res.body.projectID}`);
+            console.error(`Error!\nReason: ${res.body.projectDetails}`);
             projectIdElement.innerHTML="Project ID: Unknown";
           }
         })
@@ -166,7 +174,7 @@
         });
     }
 
-    getProjectId();
+    getProjectDetails();
     refreshUserList();
   </script>
 </body>

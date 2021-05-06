@@ -9,11 +9,11 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
   router.use(express.json());
   router.use(express.urlencoded({ extended: false }));
 
-  router.get('/projectID', (req, res) => {
-    const projectID: string = firebaseDashboard.getProjectID();
+  router.get('/projectDetails', (req, res) => {
+    const projectDetails = firebaseDashboard.getProjectDetails();
     return res.json({
-      isSuccessful: Boolean(projectID),
-      projectID,
+      isSuccessful: Boolean(projectDetails),
+      projectDetails,
     });
   });
 
