@@ -49,7 +49,7 @@ export default class FirebaseDashboard {
       if (!this.options.webAPI) {
         console.warn(
           `The options that were provided to the 'firebase-express-dashboard' lacked the 'webAPI' field that is ` +
-            `necessary for some Firebase APIs(e.g.reset - password).\nThe value of the 'webAPI' field should be retrieved from: ` +
+            `necessary for some Firebase APIs (e.g.reset - password).\nThe value of the 'webAPI' field should be retrieved from: ` +
             `Firebase project settings screen -> 'General' tab -> 'Your project' section -> 'Web API Key' field.`
         );
       }
