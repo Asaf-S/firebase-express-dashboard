@@ -1,4 +1,6 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npx --no-install lint-staged && npx --no-install tsc
+npx lint-staged
+npx tsc
+npm test
