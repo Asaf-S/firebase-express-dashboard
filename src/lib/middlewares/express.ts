@@ -86,6 +86,13 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
           // Object.keys(claims).forEach()
           await firebaseDashboard.updateCustomClaims(userID, req.body.newClaims);
           console.log(`The claims of user ${userID} was successfully updated!`);
+        } else {
+          const errMsg1 = `No claims were found on the request for user  ${userID}`;
+          console.error(errMsg1);
+          return res.json({
+            isSuccessful: false,
+            reason: errMsg1,
+          });
         }
 
         return res.json({

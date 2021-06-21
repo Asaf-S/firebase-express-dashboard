@@ -21,15 +21,29 @@
     const projectIdElement = document.getElementById('project_id');
 
 
-    function postToServer(url, body) {
+    function sendToServer(url, body, method) {
       const headers = {
         'Content-Type': 'application/json'
       };
 
-      return superagent
-        .post(url)
+      let req;
+      switch(method) {
+        default:
+          throw new Error(`Error in 'sendToServer': 'method' is missing`);
+          break;
+
+        case "POST":
+          req = superagent.post(url);
+          break;
+
+        case "PUT":
+          req = superagent.put(url);
+          break;
+      }
+
+      return req
         .set(headers)
-        .send(JSON.stringify(body));del
+        .send(JSON.stringify(body));
     }
 
     function refreshUserList() {
@@ -79,7 +93,7 @@
               </td>
               <td>
                 ${user.emailVerified ? '' : `<button onclick="alert('${user.uid}')">Send verification email</button>`}
-                <button onclick="alert('Under development ${user.uid}')">Set claims</button>
+                <button onclick="updateClaims('${user.uid}')">Set claims</button>
                 <button onclick="alert('Under development ${user.uid}')">Disable</button>
                 <button class="dependantOnWebAPI" onclick="reset_password('${user.email}')">Reset password</button>
                 <button onclick="deleteUser('${user.uid}')">Delete</button>
@@ -103,7 +117,7 @@
     function createNewUser() {
       const email = prompt("Please enter an email address:");
       if (email) {
-        postToServer('users/new', { email }).then(res => {
+        sendToServer('users/new', { email }, 'POST').then(res => {
           if(res.body.isSuccessful) {
             console.log(`Email: ${email}\nUser ID: ${res.body.userID}`);
             alert('New user successfully created!');
@@ -120,7 +134,7 @@
     function reset_password(email) {
       if(confirm("Send a reset-password email to the user's email?")) {
 
-        postToServer('resetpassword', { email }).then(res => {
+        sendToServer('resetpassword', { email }, 'POST').then(res => {
           if(res && res.body && res.body.isSuccessful) {
             alert(`Password-reset email was sent!`);
           } else {
@@ -157,7 +171,9 @@
           if(res.body.isSuccessful) {
             const claims = res.body.claims;
             if(claims) {
-              alert(JSON.stringify(claims, null, 2));
+              const parsedClaims = JSON.stringify(claims, null, 2);
+              console.log(`The claims of user ${uid} are: ${parsedClaims}`);
+              alert(parsedClaims);
             } else {
               alert(`The user has no claims!`);
             }
@@ -168,16 +184,32 @@
     }
 
     function updateClaims(uid) {
+      const inputFromUser = window.prompt("Provide a valid JSON object to be set as the user's claims", "{}");
+      if(inputFromUser) {
+        try {
+          const parsedClaims = JSON.parse(inputFromUser);
+          const body = {
+            newClaims: parsedClaims,
+          }
 
-      postToServer(`users/${uid}`, { admin: 1 }).then(res => {
-        if(res && res.body && res.body.isSuccessful) {
-          console.log(`Claims were updated!`);
-        } else {
-          const err1 = `Failed to update claims!`;
-          console.error(err1);
-          alert(err1);
+          sendToServer(`users/${uid}`, body, 'PUT').then(res => {
+            if(res && res.body && res.body.isSuccessful) {
+              const strMsg = `Claims were updated for ${uid}`;
+              console.log(strMsg);
+              alert(strMsg);
+            } else {
+              const err1 = `Failed to update claims for ${uid}!`;
+              console.error(err1);
+              alert(err1);
+            }
+          });
+        } catch (e) {
+          alert('The input is not a valid JSON object!');
         }
-      });
+      } else {
+        console.log(`User canceled updating the claims' of ${uid}`);
+
+      }
     }
 
     function getProjectDetails() {
