@@ -136,7 +136,7 @@ export default class FirebaseDashboard {
 
   async resetPassword(email: string): Promise<boolean> {
     if (!this.options.webAPI) {
-      throw new Error("This action requires the `options.webAPI` parameter which wasn't provided.");
+      throw new Error(`This action "Reset Password" requires the "options.webAPI" parameter which wasn't provided.`);
     }
 
     const url = `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode`;
