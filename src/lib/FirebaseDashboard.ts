@@ -122,7 +122,9 @@ export default class FirebaseDashboard {
     }
 
     const userRecord = await this.firebase.auth().createUser(details);
-    console.log('Successfully created new user:', userRecord.uid);
+    const strLog = `Successfully created new user: ${userRecord.uid}`;
+    console.log(strLog);
+    alert(strLog);
 
     if (shouldResetPasswordEmailBeSent) {
       console.log('Sending a reset-password email to the new user');
