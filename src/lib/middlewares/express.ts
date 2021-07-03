@@ -152,7 +152,7 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
     }
   });
 
-  router.post('/resetpassword', (req: express.Request, res) => {
+  router.post('/resetpassword', (req, res) => {
     return firebaseDashboard
       .resetPassword(req.body.email)
       .then(isSuccessful => {
@@ -167,6 +167,48 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
           reason: err.stack,
         });
       });
+  });
+
+  router.post('/users/:userID/disabled', async (req, res) => {
+    try {
+      const userID: string = req.params?.userID;
+
+      // Validations
+      if (!userID) {
+        return res.json({
+          isSuccessful: false,
+          reason: 'User ID is missing in the path!',
+        });
+      }
+
+      if (!req.body) {
+        return res.json({
+          isSuccessful: false,
+          reason: "Request's body is empty!",
+        });
+      }
+
+      if (!('shouldBeDisabled' in req.body)) {
+        return res.json({
+          isSuccessful: false,
+          reason: `'shouldBeDisabled' paramter (boolean) is missing in request!`,
+        });
+      }
+
+      await firebaseDashboard.changeUserDisableEnableStatus(userID, req.body.shouldBeDisabled);
+
+      return res.json({
+        isSuccessful: true,
+        userID,
+      });
+    } catch (err) {
+      const errStr = `Error: ${err.stack}`;
+      console.error(errStr);
+      return res.json({
+        isSuccessful: false,
+        reason: errStr,
+      });
+    }
   });
 
   router.use(express.static(path.join(__dirname, '../../public')));

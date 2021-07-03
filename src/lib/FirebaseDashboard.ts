@@ -176,6 +176,13 @@ export default class FirebaseDashboard {
     console.log(`Successfully deleted user: ${uid}`);
   }
 
+  async changeUserDisableEnableStatus(uid: string, shouldBeDisabled: boolean): Promise<void> {
+    await this.firebase.auth().updateUser(uid, {
+      disabled: shouldBeDisabled,
+    });
+    console.log(`Successfully ${shouldBeDisabled ? 'dis' : 'en'}abled user: ${uid}`);
+  }
+
   async getClaims(uid: string): Promise<{ [key: string]: any } | undefined | null> {
     const user = await this.firebase.auth().getUser(uid);
     return user.customClaims;

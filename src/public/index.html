@@ -70,7 +70,7 @@
             const lastSignInTime_String = lastSignInTime_Date.getTime() ? lastSignInTime_Date.toISOString().replace('T', ' ').replace('.000Z', '') : "Never";
 
             return `
-            <tr>
+            <tr style="color:${user.disabled ? 'gray' : 'black'}">
               <td>${user.uid}</td>
               <td>${user.email}</td>
               <td>${user.emailVerified ? 'V' : 'X'}</td>
@@ -94,7 +94,7 @@
               <td>
                 ${user.emailVerified ? '' : `<button onclick="alert('${user.uid}')">Send verification email</button>`}
                 <button onclick="updateClaims('${user.uid}')">Set claims</button>
-                <button onclick="alert('Under development ${user.uid}')">Disable</button>
+                <button onclick="changeUserDisableEnableStatus('${user.uid}',${!user.disabled})">${user.disabled?`En`:`Dis`}able</button>
                 <button class="dependantOnWebAPI" onclick="reset_password('${user.email}')">Reset password</button>
                 <button onclick="deleteUser('${user.uid}')">Delete</button>
               </td>
@@ -156,6 +156,27 @@
             if(res.body.isSuccessful) {
               console.log(`Deleted user ID: ${res.body.userID}`);
               alert('The user was successfully deleted!');
+            } else {
+              alert(`Error!\nReason: ${res.body.reason}`);
+            }
+            refreshUserList();
+          });
+      }
+    }
+
+    function changeUserDisableEnableStatus(uid, shouldBeDisabled) {
+      if(uid && confirm(`Are you sure you want to ${shouldBeDisabled ? `DISABLE` : `ENABLE`} this user?`)) {
+
+        return superagent
+          .post(`users/${uid}/disabled`)
+          .send({
+            shouldBeDisabled: shouldBeDisabled,
+          })
+          .then(res => {
+            if(res.body.isSuccessful) {
+              const msg = `User ID: ${res.body.userID} was successfully ${shouldBeDisabled ? `DISABLED` : `ENABLED`}!`;
+              console.log(msg);
+              alert(msg);
             } else {
               alert(`Error!\nReason: ${res.body.reason}`);
             }
