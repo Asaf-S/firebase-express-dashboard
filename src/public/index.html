@@ -185,27 +185,46 @@
       }
     }
 
-    function showClaims(uid) {
+    function _getClaims(uid) {
       return superagent
         .get(`users/${uid}/claims`)
         .then(function (res) {
           if(res.body.isSuccessful) {
             const claims = res.body.claims;
             if(claims) {
-              const parsedClaims = JSON.stringify(claims, null, 2);
-              console.log(`The claims of user ${uid} are: ${parsedClaims}`);
-              alert(parsedClaims);
+              console.log(`The claims of user ${uid} are: ${JSON.stringify(claims)}`);
+              return claims;
             } else {
-              alert(`The user has no claims!`);
+              return {};
             }
           } else {
-            alert(`Error getting the user's claims!`);
+            const strErr = `Error getting the user's claims of user ${uid}!`;
+            console.error(strErr);
+            throw new Error(strErr)
           }
         });
     }
 
-    function updateClaims(uid) {
-      const inputFromUser = window.prompt("Provide a valid JSON object to be set as the user's claims", "{}");
+    function showClaims(uid) {
+      return _getClaims(uid).then(function (claims) {
+        const parsedClaims = JSON.stringify(claims, null, 2);
+        console.log(`The claims of user ${uid} are: ${parsedClaims}`);
+        alert(parsedClaims);
+      }).catch((err)=>{
+        alert(err.message);
+      });
+    }
+
+    async function updateClaims(uid) {
+      let currentClaims;
+      try {
+        currentClaims = await _getClaims(uid);
+        currentClaims = JSON.stringify(currentClaims);
+      } catch(err) {
+        currentClaims = '';
+      }
+
+      const inputFromUser = window.prompt("Provide a valid JSON object to be set as the user's claims", currentClaims);
       if(inputFromUser) {
         try {
           const parsedClaims = JSON.parse(inputFromUser);

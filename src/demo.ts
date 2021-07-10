@@ -6,7 +6,7 @@ import FB_admin from 'firebase-admin';
 import firebasedashboard from './index';
 import { IOptions } from './lib/FirebaseDashboard';
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5050;
 const ROUTE_PATH = '/firebasedashboard';
 
 function convertToString(value: any) {
