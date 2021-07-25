@@ -1,6 +1,10 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
+# git stash --keep-index -u
+echo --------- STARTING HUSKY HOOK ---------
 npx lint-staged
 npx tsc
 npm test
+echo --------- FINISHING HUSKY HOOK ---------
+# git stash pop
