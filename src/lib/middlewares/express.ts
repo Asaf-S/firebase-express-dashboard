@@ -3,6 +3,7 @@ import path from 'path';
 import express from 'express';
 import FirebaseDashboard from '../FirebaseDashboard';
 import fs from 'fs';
+import { makeSureTrailingSlashInURL } from '../../utils';
 
 const html: string = fs.readFileSync(__dirname + '/../../public/index.html', 'utf-8');
 export default function createRoutes(firebaseDashboard: FirebaseDashboard): express.Router {
@@ -216,8 +217,12 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
   router.get('/', (req, res) => {
     let token: string = '';
     let authType: string = '';
-    const requestProtocol = req.protocol + (req.secure ? 's' : '');
-    const requestURL = `${requestProtocol}://${req.get('host')}${req.originalUrl}`;
+    const requestHost = req.get('host');
+    const isSecure: boolean =
+      req.secure ||
+      (!requestHost?.toLowerCase().includes('localhost') && !requestHost?.toLowerCase().includes('127.0.0.1'));
+    const requestProtocol = req.protocol + (isSecure ? 's' : '');
+    const requestURL = makeSureTrailingSlashInURL(`${requestProtocol}://${requestHost}${req.originalUrl}`);
 
     /* Bearer token */
     const bearer = 'bearer ';
