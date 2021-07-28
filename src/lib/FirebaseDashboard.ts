@@ -27,7 +27,7 @@ function parseOptions(options: IOptions): IOptions {
         'only (and not production)! Please refer to the documentation and demo for further information:\n' +
         'https://www.npmjs.com/package/firebase-express-dashboard\n' +
         'Once the permissions are taken care of, please pass { werePermissionsTakenCareOf: true } as the input options to ' +
-        'surpress this message.'
+        'suppress this message.'
     );
   }
 
@@ -49,8 +49,8 @@ export default class FirebaseDashboard {
       if (!this.options.webAPI) {
         console.warn(
           `The options that were provided to the 'firebase-express-dashboard' lacked the 'webAPI' field that is ` +
-            `necessary for some Firebase APIs (e.g.reset - password).\nThe value of the 'webAPI' field should be retrieved from: ` +
-            `Firebase project settings screen -> 'General' tab -> 'Your project' section -> 'Web API Key' field.`
+            `necessary for some Firebase APIs (e.g. reset password).\nThe value of the 'webAPI' field should be retrieved from: ` +
+            `Firebase Console website -> Project settings screen -> 'General' tab -> 'Your project' section -> 'Web API Key' field.`
         );
       }
     } else {
@@ -180,7 +180,7 @@ export default class FirebaseDashboard {
     await this.firebase.auth().updateUser(uid, {
       disabled: shouldBeDisabled,
     });
-    console.log(`Successfully ${shouldBeDisabled ? 'dis' : 'en'}abled user: ${uid}`);
+    console.log(`Successfully ${shouldBeDisabled ? 'disabled' : 'enabled'} user: ${uid}`);
   }
 
   async getClaims(uid: string): Promise<{ [key: string]: any } | undefined | null> {
