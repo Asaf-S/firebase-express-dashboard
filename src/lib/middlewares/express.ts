@@ -212,11 +212,12 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
       });
     }
   });
+
   router.get('/', (req, res) => {
     let token: string = '';
     let authType: string = '';
-    const requestProtocol = req.secure ? 'https' : 'http';
-    const requestURL = requestProtocol + '://' + req.get('host') + req.originalUrl;
+    const requestProtocol = req.protocol + (req.secure ? 's' : '');
+    const requestURL = `${requestProtocol}://${req.get('host')}${req.originalUrl}`;
 
     /* Bearer token */
     const bearer = 'bearer ';
@@ -231,6 +232,7 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
         .replace('BASEURLBASEURLBASEURL', requestURL)
     );
   });
+
   router.use(express.static(path.join(__dirname, '../../public')));
 
   return router;
