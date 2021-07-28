@@ -5,5 +5,5 @@ export function makeSureTrailingSlashInURL(url: string) {
   } else {
     returnURL = url + '/';
   }
-  return url;
+  return returnURL;
 }
