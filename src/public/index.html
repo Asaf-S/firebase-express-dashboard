@@ -15,41 +15,51 @@
   </div>
   <div id="main">Loading...</div>
   <script>
-
+    window.token = 'TOKENTOKENTOKEN';
+    window.authType = 'AUTHTYPEAUTHTYPEAUTHTYPE';
     window.shouldResetButtonBeDisabled = true;
     const mainElement = document.getElementById('main');
     const projectIdElement = document.getElementById('project_id');
 
 
     function sendToServer(url, body, method) {
+
+      //let req;
+      // switch(method) {
+      //   default:
+      //     throw new Error(`Error in 'sendToServer': 'method' is missing`);
+      //     break;
+
+      //   case "POST":
+      //     req = superagent.post(url);
+      //     break;
+
+      //   case "PUT":
+      //     req = superagent.put(url);
+      //     break;
+      // }
+
       const headers = {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       };
-
-      let req;
-      switch(method) {
-        default:
-          throw new Error(`Error in 'sendToServer': 'method' is missing`);
+      switch(window.authType)
+      {
+        case 'bearer':
+          headers.Authorization='Bearer '+window.token;
           break;
 
-        case "POST":
-          req = superagent.post(url);
-          break;
-
-        case "PUT":
-          req = superagent.put(url);
-          break;
+          default:
+            /*DO NOTHING*/
       }
 
-      return req
+      return superagent(method,'BASEURLBASEURLBASEURL'+url)
         .set(headers)
         .send(JSON.stringify(body));
     }
 
     function refreshUserList() {
       mainElement.innerHTML=`Loading...`;
-      return superagent
-        .get('users')
+      return sendToServer('users', null, 'GET')
         .then(function (res) {
           const htmlTable_prefix = `
           <table border='1' style='width:100%;border-width:1px;border-color:black;'>
@@ -148,8 +158,7 @@
     function deleteUser(uid) {
       if(uid && confirm("Are you sure you want to DELETE this user?")) {
 
-        return superagent
-          .del(`users/${uid}`)
+        return sendToServer(`users/${uid}`, null, 'DELETE')
           // .set(headers)
           // .send(JSON.stringify(body))
           .then(res => {
@@ -167,8 +176,7 @@
     function changeUserDisableEnableStatus(uid, shouldBeDisabled) {
       if(uid && confirm(`Are you sure you want to ${shouldBeDisabled ? `DISABLE` : `ENABLE`} this user?`)) {
 
-        return superagent
-          .post(`users/${uid}/disabled`)
+        return sendToServer(`users/${uid}/disabled`, null, 'POST')
           .send({
             shouldBeDisabled: shouldBeDisabled,
           })
@@ -186,8 +194,7 @@
     }
 
     function _getClaims(uid) {
-      return superagent
-        .get(`users/${uid}/claims`)
+      return sendToServer(`users/${uid}/claims`, null, 'GET')
         .then(function (res) {
           if(res.body.isSuccessful) {
             const claims = res.body.claims;
@@ -253,10 +260,8 @@
     }
 
     function getProjectDetails() {
-
       projectIdElement.innerHTML=`Loading...`;
-      return superagent
-        .get('projectDetails')
+      return sendToServer('projectDetails', null, 'GET')
         .then(function (res) {
           if(res.body.isSuccessful && res.body.projectDetails) {
             projectIdElement.innerHTML=res.body.projectDetails.projectId;

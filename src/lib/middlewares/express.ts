@@ -2,7 +2,9 @@
 import path from 'path';
 import express from 'express';
 import FirebaseDashboard from '../FirebaseDashboard';
+import fs from 'fs';
 
+const html: string = fs.readFileSync(__dirname + '/../../public/index.html', 'utf-8');
 export default function createRoutes(firebaseDashboard: FirebaseDashboard): express.Router {
   const router = express.Router({ mergeParams: true });
 
@@ -210,7 +212,25 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
       });
     }
   });
+  router.get('/', (req, res) => {
+    let token: string = '';
+    let authType: string = '';
+    const requestProtocol = req.secure ? 'https' : 'http';
+    const requestURL = requestProtocol + '://' + req.get('host') + req.originalUrl;
 
+    /* Bearer token */
+    const bearer = 'bearer ';
+    if (req.headers.authorization?.toLowerCase().startsWith(bearer)) {
+      token = req.headers.authorization.substr(bearer.length);
+      authType = 'bearer';
+    }
+    return res.send(
+      html
+        .replace('TOKENTOKENTOKEN', token)
+        .replace('AUTHTYPEAUTHTYPEAUTHTYPE', authType)
+        .replace('BASEURLBASEURLBASEURL', requestURL)
+    );
+  });
   router.use(express.static(path.join(__dirname, '../../public')));
 
   return router;
