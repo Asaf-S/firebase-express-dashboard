@@ -155,7 +155,7 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
     }
   });
 
-  router.post('/resetpassword', (req, res) => {
+  router.post('/resetPassword', (req, res) => {
     return firebaseDashboard
       .resetPassword(req.body.email)
       .then(isSuccessful => {

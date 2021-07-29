@@ -39,7 +39,7 @@
 
       return superagent(method,'BASEURLBASEURLBASEURL'+url)
         .set(headers)
-        .send(JSON.stringify(body));
+        .send(body ? JSON.stringify(body) : undefined);
     }
 
     function refreshUserList() {
@@ -102,7 +102,7 @@
           const buttonsDependantOnWebAPI = document.getElementsByClassName('dependantOnWebAPI');
           for (var button of buttonsDependantOnWebAPI) {
             button.disabled = window.shouldResetButtonBeDisabled;
-            button.title = window.shouldResetButtonBeDisabled ? "The webAPI field was not provided to 'firebase-express-dashbard'." : "";
+            button.title = window.shouldResetButtonBeDisabled ? "The webAPI field was not provided to 'firebase-express-dashboard'." : "";
           }
         }).catch((err) => {
           console.error(`ERROR: ${err.stack}`);
@@ -129,7 +129,7 @@
     function reset_password(email) {
       if(confirm("Send a reset-password email to the user's email?")) {
 
-        sendToServer('resetpassword', { email }, 'POST').then(res => {
+        sendToServer('resetPassword', { email }, 'POST').then(res => {
           if(res && res.body && res.body.isSuccessful) {
             alert(`Password-reset email was sent!`);
           } else {
