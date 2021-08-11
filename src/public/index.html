@@ -15,8 +15,8 @@
   </div>
   <div id="main">Loading...</div>
   <script>
-    window.token = 'TOKENTOKENTOKEN';
-    window.authType = 'AUTHTYPEAUTHTYPEAUTHTYPE';
+    window.token = 'TOKEN_TOKEN_TOKEN';
+    window.authType = 'AUTH_TYPE__AUTH_TYPE__AUTH_TYPE';
     window.shouldResetButtonBeDisabled = true;
     const mainElement = document.getElementById('main');
     const projectIdElement = document.getElementById('project_id');
@@ -37,7 +37,7 @@
           /*DO NOTHING*/
       }
 
-      return superagent(method,'BASEURLBASEURLBASEURL'+url)
+      return superagent(method,'BASE_URL__BASE_URL__BASE_URL'+url)
         .set(headers)
         .send(body ? JSON.stringify(body) : undefined);
     }

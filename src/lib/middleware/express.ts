@@ -232,9 +232,9 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
     }
     return res.send(
       html
-        .replace('TOKENTOKENTOKEN', token)
-        .replace('AUTHTYPEAUTHTYPEAUTHTYPE', authType)
-        .replace('BASEURLBASEURLBASEURL', requestURL)
+        .replace('TOKEN_TOKEN_TOKEN', token)
+        .replace('AUTH_TYPE__AUTH_TYPE__AUTH_TYPE', authType)
+        .replace('BASE_URL__BASE_URL__BASE_URL', requestURL)
     );
   });
 

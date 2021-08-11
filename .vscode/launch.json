@@ -11,7 +11,28 @@
       "cwd": "${workspaceRoot}",
       "runtimeExecutable": "npm",
       "runtimeArgs": [
-        "run", "start"
+        "run",
+        "start"
+      ],
+      "outputCapture": "std",
+      "envFile": "${workspaceFolder}/.env",
+      "port": 9229,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "outFiles": [
+        "${workspaceFolder}/dist/**/*.js"
+      ]
+    },
+    {
+      "name": "Test",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceRoot}",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "test"
       ],
       "outputCapture": "std",
       "envFile": "${workspaceFolder}/.env",
