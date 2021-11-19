@@ -5,7 +5,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Web - Launch via NPM",
+      "name": "Demo",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceRoot}",

@@ -3,8 +3,14 @@
 
 # git stash --keep-index -u
 echo --------- STARTING HUSKY HOOK ---------
+
+files=$(git diff --cached --name-only)
+echo Staged files [space-separated]: $files
+
+npx cspell $files --relative
+
 npx lint-staged
 npx tsc
-npm test
+npm run test
 echo --------- FINISHING HUSKY HOOK ---------
 # git stash pop
