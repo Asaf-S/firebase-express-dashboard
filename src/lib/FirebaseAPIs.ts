@@ -2,6 +2,7 @@
 
 import * as FirebaseAdmin from 'firebase-admin';
 import superagent from 'superagent';
+import { IEnhancedUserRecord } from './types';
 
 // Docs:
 // https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
@@ -12,6 +13,12 @@ export interface IOptions {
   werePermissionsTakenCareOf?: boolean;
   recordsPerPageInUserList?: number;
   webAPI?: string;
+  /**
+   * When set, this will determine whether a user is the owner of this project.
+   * This library will not allow anyone, not even the owners themselves, to downgrade the permission of an owner (at least not using
+   * this library).
+   */
+  isOwner?: (userRecord: FirebaseAdmin.auth.UserRecord) => boolean;
 }
 
 function parseOptions(options: IOptions): IOptions {
@@ -38,7 +45,7 @@ function parseOptions(options: IOptions): IOptions {
   return options;
 }
 
-export default class FirebaseDashboard {
+export class FirebaseAPIs {
   private firebase: FirebaseAdmin.app.App;
   private options: IOptions;
 
@@ -67,11 +74,12 @@ export default class FirebaseDashboard {
     return {
       shouldResetButtonBeDisabled: !this.options.webAPI,
       projectId,
+      hasIsOwnerField: !!this.options.isOwner,
     };
   }
 
-  async listUsers(): Promise<object[]> {
-    const userList: object[] = [];
+  async listUsers(): Promise<IEnhancedUserRecord[]> {
+    const userList: IEnhancedUserRecord[] = [];
     let nextPageToken: string | undefined;
 
     // TODO: support paging
@@ -80,8 +88,13 @@ export default class FirebaseDashboard {
         .auth()
         .listUsers(this.options.recordsPerPageInUserList, nextPageToken)
         .then(listUsersResult => {
-          listUsersResult.users.forEach((userRecord: FirebaseAdmin.auth.UserRecord) => {
-            userList.push(userRecord.toJSON());
+          listUsersResult.users.forEach(userRecord => {
+            const parsedResponse: IEnhancedUserRecord = userRecord.toJSON() as FirebaseAdmin.auth.UserRecord;
+
+            if (this.options.isOwner) {
+              parsedResponse.isOwner = this.options.isOwner(userRecord);
+            }
+            userList.push(parsedResponse);
           });
 
           nextPageToken = listUsersResult.pageToken;
@@ -183,7 +196,7 @@ export default class FirebaseDashboard {
     console.log(`Successfully ${shouldBeDisabled ? 'disabled' : 'enabled'} user: ${uid}`);
   }
 
-  async getClaims(uid: string): Promise<{ [key: string]: any } | undefined | null> {
+  async getClaims(uid: string): Promise<{ [key: string]: unknown } | undefined | null> {
     const user = await this.firebase.auth().getUser(uid);
     return user.customClaims;
   }

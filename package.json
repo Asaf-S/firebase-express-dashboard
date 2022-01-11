@@ -12,14 +12,14 @@
     "task:clean": "rimraf ./dist",
     "task:typescript": "tsc -sourcemap",
     "task:static": "shx cp -R ./src/public ./dist",
-    "task:tslint": "tslint -c tslint.json -p tsconfig.json --fix",
+    "task:eslint": "eslint --ignore-path .gitignore . --fix",
     "task:jest": "jest --forceExit",
     "task:codecov": "dotenv codecov -f coverage/*.json",
     "test": "npm-run-all task:clean task:jest task:codecov",
     "release": "np",
     "prepare": "npm run build && husky install",
     "prestart": "npm run build",
-    "build": "npm-run-all task:clean task:tslint task:typescript task:static",
+    "build": "npm-run-all task:clean task:eslint task:typescript task:static",
     "start": "node -r source-map-support/register dist/demo.js"
   },
   "bugs": {
@@ -43,6 +43,7 @@
     "@types/jest": "^26.0.23",
     "@types/json-stringify-safe": "^5.0.0",
     "@types/superagent": "^4.1.10",
+    "@typescript-eslint/eslint-plugin": "^5.9.1",
     "codecov": "^3.8.3",
     "dotenv": "^9.0.2",
     "dotenv-cli": "^4.1.0",
@@ -54,17 +55,17 @@
     "rimraf": "^3.0.2",
     "shx": "^0.3.3",
     "ts-jest": "^26.5.4",
-    "ts-node": "^9.1.1",
-    "tslint": "^6.1.3"
+    "ts-node": "^9.1.1"
   },
   "dependencies": {
     "@types/node": "^15.0.2",
     "cors": "^2.8.5",
+    "eslint": "^8.6.0",
     "express": "^4.17.1",
     "firebase-admin": "^9.5.0",
     "json-stringify-safe": "^5.0.1",
     "np": "*",
     "superagent": "^6.1.0",
-    "typescript": "^4.3.4"
+    "typescript": "^4.5.4"
   }
 }

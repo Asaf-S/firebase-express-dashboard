@@ -13,7 +13,7 @@ module.exports = {
   // bail: 0,
 
   // The directory where Jest should store its cached dependency information
-  // cacheDirectory: "/private/var/folders/z6/4p2q2zc97qg23jkjm2sj7g1h0000gn/T/jest_dx",
+  // cacheDirectory: "/private/var/folders/z6/4p2q2zc97qg23jm2sj7g1h0000gn/T/jest_dx",
 
   // Automatically clear mock calls and instances between every test
   // clearMocks: false,
@@ -140,7 +140,7 @@ module.exports = {
   setupFiles: ['dotenv/config'],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
-  setupFilesAfterEnv: ['./jest.setup.ts'],
+  setupFilesAfterEnv: ['./jest.beforeAll.ts'],
 
   // The number of seconds after which a test is considered as slow and reported as such in the results.
   // slowTestThreshold: 5,

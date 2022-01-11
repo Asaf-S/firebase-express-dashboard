@@ -3,14 +3,14 @@ import cors from 'cors';
 import json_stringify_safe from 'json-stringify-safe';
 import FB_admin from 'firebase-admin';
 
-import firebasedashboard from './index';
-import { IOptions } from './lib/FirebaseDashboard';
+import { FirebaseDashboardRoutes } from './index';
+import { IOptions } from './lib/FirebaseAPIs';
 
 const PORT = process.env.PORT || 5050;
-const ROUTE_PATH = '/firebasedashboard';
+const ROUTE_PATH = '/firebaseDashboard';
 
-function convertToString(value: any) {
-  const isError = (obj: any) => {
+function convertToString(value: unknown) {
+  const isError = (obj: unknown) => {
     return Object.prototype.toString.call(obj) === '[object Error]';
     // return obj && obj.stack && obj.message && typeof obj.stack === 'string'
     //        && typeof obj.message === 'string';
@@ -26,7 +26,8 @@ function convertToString(value: any) {
         return '' + value;
       case 'object':
         if (isError(value)) {
-          return value.stack;
+          const error1: Error = value as Error;
+          return error1.stack || error1.message;
         } else {
           return json_stringify_safe(value, null, 2);
         }
@@ -65,7 +66,7 @@ if (process.env.FB_SECRETS) {
   fb_secrets.client_email = process.env.CLIENT_EMAIL || '';
   fb_secrets.client_id = process.env.CLIENT_ID || '';
   fb_secrets.client_x509_cert_url = process.env.CLIENT_X509_CERT_URL || '';
-  fb_secrets.databaseURL = process.env.DATABASEURL || '';
+  fb_secrets.databaseURL = process.env.DATABASE_URL || '';
 }
 
 if (!fb_secrets.project_id) {
@@ -90,7 +91,7 @@ const firebaseInstance = FB_admin.initializeApp({
   databaseURL: fb_secrets.databaseURL,
 });
 
-function manuallyCheckPermissions(req: express.Request, res: express.Response, next: express.NextFunction): any {
+function manuallyCheckPermissions(req: express.Request, res: express.Response, next: express.NextFunction): unknown {
   if (process.env.NODE_ENV !== 'production' || req.header('Authorization') === 'Bearer ExpectedTokenOfAdmin') {
     return next();
   } else {
@@ -101,10 +102,11 @@ function manuallyCheckPermissions(req: express.Request, res: express.Response, n
 const FB_options: IOptions = {
   werePermissionsTakenCareOf: true, // This should be set to 'true' only when the permissions are actually taken care of and are tested
   webAPI: process.env.FIREBASE_WEB_API || '', // This allows making some more actions like Reset password, etc.
+  isOwner: (userRecord: FB_admin.auth.UserRecord) => userRecord.customClaims?.isOwner,
 };
 
 const app = express()
-  // Middlewares
+  // Middleware
   .use(cors())
   .use(express.json())
   .use(
@@ -114,7 +116,7 @@ const app = express()
   )
 
   // API routes
-  .use(ROUTE_PATH, manuallyCheckPermissions, firebasedashboard(firebaseInstance, FB_options))
+  .use(ROUTE_PATH, manuallyCheckPermissions, FirebaseDashboardRoutes(firebaseInstance, FB_options))
 
   // Wildcard
   .all('*', (req: express.Request, res: express.Response) => {

@@ -39,13 +39,14 @@
 
       return superagent(method,'BASE_URL__BASE_URL__BASE_URL'+url)
         .set(headers)
-        .send(body ? JSON.stringify(body) : undefined);
+        .send(body && JSON.stringify(body));
     }
 
     function refreshUserList() {
       mainElement.innerHTML=`Loading...`;
       return sendToServer('users', null, 'GET')
         .then(function (res) {
+          let shouldIconAttributionBeShown = false;
           const htmlTable_prefix = `
           <table border='1' style='width:100%;border-width:1px;border-color:black;'>
             <tr style='background: lightgray'>
@@ -56,13 +57,17 @@
               <th>Creation Time</th>
               <th>Last Sign In</th>
               <th>Providers</th>
+              ${res.body.hasIsOwnerField ? '<th>Is Owner</th>':''}
               <th>Claims</th>
               <th>Actions</th>
             </tr>
           `;
-          const htmlTable_data = res.body.map((user) => {
+          const htmlTable_data = res.body.users.map((user) => {
             const lastSignInTime_Date = new Date(user.metadata.lastSignInTime);
             const lastSignInTime_String = lastSignInTime_Date.getTime() ? lastSignInTime_Date.toISOString().replace('T', ' ').replace('.000Z', '') : "Never";
+            if(res.body.hasIsOwnerField && user.isOwner) {
+              shouldIconAttributionBeShown = true;
+            }
 
             return `
             <tr style="color:${user.disabled ? 'gray' : 'black'}">
@@ -80,6 +85,7 @@
                   return prefix + JSON.stringify(provider, null, 2) + '\n';
                 }
               })}</td>
+              ${res.body.hasIsOwnerField ? `<td>${user.isOwner ? '<img src="https://cdn.iconscout.com/icon/free/png-256/crown-1777371-1512061.png" title="Owner" alt="Owner" style="height: 24px;width: 24px;">' : ''}</td>`:'' }
               <td style="text-align: center;">
                 <img
                   onclick="showClaims('${user.uid}')"
@@ -89,15 +95,16 @@
               <td>
                 ${user.emailVerified ? '' : `<button onclick="alert('${user.uid}')">Send verification email</button>`}
                 <button onclick="updateClaims('${user.uid}')">Set claims</button>
-                <button onclick="changeUserDisableEnableStatus('${user.uid}',${!user.disabled})">${user.disabled?`En`:`Dis`}able</button>
+                <button onclick="changeUserDisableEnableStatus('${user.uid}',${!user.disabled})" ${(res.body.hasIsOwnerField && user.isOwner && !user.disabled)?'disabled':''}>${user.disabled?`En`:`Dis`}able</button>
                 <button class="dependantOnWebAPI" onclick="reset_password('${user.email}')">Reset password</button>
-                <button onclick="deleteUser('${user.uid}')">Delete</button>
+                <button onclick="deleteUser('${user.uid}')" ${(res.body.hasIsOwnerField && user.isOwner)?'disabled':''}>Delete</button>
               </td>
             </tr>`;
           }).join('');
           const htmlTable_suffix = `</table>`;
+          const iconAttribution = '<br><br><div>Icons made by <a href="https://iconscout.com" title="iconscout.com">iconscout.com</a></div>';
 
-          mainElement.innerHTML = htmlTable_prefix + htmlTable_data + htmlTable_suffix;
+          mainElement.innerHTML = htmlTable_prefix + htmlTable_data + htmlTable_suffix + (shouldIconAttributionBeShown ? iconAttribution : '');
 
           const buttonsDependantOnWebAPI = document.getElementsByClassName('dependantOnWebAPI');
           for (var button of buttonsDependantOnWebAPI) {

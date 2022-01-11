@@ -1,4 +1,5 @@
 [![codecov](https://codecov.io/gh/Asaf-S/firebase-express-dashboard/branch/main/graph/badge.svg?token=HQXFC8JKGX)](https://codecov.io/gh/Asaf-S/firebase-express-dashboard)
+
 # firebase-express-dashboard
 
 Add CRUD routes that manage Firebase Auth to Express.js.
@@ -29,7 +30,7 @@ const serviceAccount = {
 
 const firebaseInstance = FB_admin.initializeApp({
   credential: FB_admin.credential.cert(serviceAccount),
-  databaseURL: process.env.DATABASEURL,
+  databaseURL: process.env.DATABASE_URL,
 });
 
 express()

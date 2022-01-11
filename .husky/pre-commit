@@ -1,15 +1,18 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
+# LN
+
 # git stash --keep-index -u
+# git stash --keep-index -u -m STASH_NAME
 echo --------- STARTING HUSKY HOOK ---------
-
-files=$(git diff --cached --name-only)
-echo Staged files [space-separated]: $files
-
-npx cspell $files --relative
+# files=$(git diff --cached --name-only)
+# echo Staged files [space-separated]: $files
 
 npx lint-staged
+npx eslint --ignore-path .gitignore . --fix
+
+npx cspell --no-summary "**/*"
 npx tsc
 npm run test
 echo --------- FINISHING HUSKY HOOK ---------

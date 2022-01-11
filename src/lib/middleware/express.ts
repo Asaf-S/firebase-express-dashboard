@@ -1,19 +1,32 @@
 'use strict';
 import path from 'path';
 import express from 'express';
-import FirebaseDashboard from '../FirebaseDashboard';
+import { FirebaseAPIs } from '../FirebaseAPIs';
 import fs from 'fs';
 import { makeSureTrailingSlashInURL } from '../../utils';
 
 const html: string = fs.readFileSync(__dirname + '/../../public/index.html', 'utf-8');
-export default function createRoutes(firebaseDashboard: FirebaseDashboard): express.Router {
+
+function handleFailure(res: express.Response, err: unknown) {
+  if (err && err instanceof Error) {
+    const errStr = `Error: ${err.stack}`;
+    console.error(errStr);
+    return res.json({
+      isSuccessful: false,
+      reason: errStr,
+    });
+  } else {
+    throw err;
+  }
+}
+export function createRoutes(firebaseApis: FirebaseAPIs): express.Router {
   const router = express.Router({ mergeParams: true });
 
   router.use(express.json());
   router.use(express.urlencoded({ extended: false }));
 
   router.get('/projectDetails', (req, res) => {
-    const projectDetails = firebaseDashboard.getProjectDetails();
+    const projectDetails = firebaseApis.getProjectDetails();
     return res.json({
       isSuccessful: Boolean(projectDetails),
       projectDetails,
@@ -21,10 +34,13 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
   });
 
   router.get('/users', (req, res) => {
-    firebaseDashboard
+    firebaseApis
       .listUsers()
       .then(userList => {
-        return res.json(userList);
+        return res.json({
+          users: userList,
+          hasIsOwnerField: firebaseApis.getProjectDetails().hasIsOwnerField,
+        });
       })
       .catch(err => {
         return res.status(500).json(err);
@@ -35,7 +51,7 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
     const userID: string = req.params?.userID;
 
     try {
-      const claims = await firebaseDashboard.getClaims(userID);
+      const claims = await firebaseApis.getClaims(userID);
       console.log(`User with UID '${userID}' has the following claims: ${JSON.stringify(claims, null, 2)}`);
 
       return res.json({
@@ -44,11 +60,7 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
         claims,
       });
     } catch (err) {
-      console.error(`Error: ${err.stack}`);
-      return res.json({
-        isSuccessful: false,
-        reason: err.message,
-      });
+      return handleFailure(res, err);
     }
   });
 
@@ -57,7 +69,7 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
 
     if (userID) {
       try {
-        await firebaseDashboard.deleteUser(userID);
+        await firebaseApis.deleteUser(userID);
         console.log(`User ${userID} was successfully deleted!`);
 
         return res.json({
@@ -65,11 +77,7 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
           userID,
         });
       } catch (err) {
-        console.error(`Error: ${err.stack}`);
-        return res.json({
-          isSuccessful: false,
-          reason: err.message,
-        });
+        return handleFailure(res, err);
       }
     } else {
       return res.json({
@@ -87,7 +95,7 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
         if (req.body.newClaims) {
           // const claims: { [key: string]: string } = req.body.newClaims;
           // Object.keys(claims).forEach()
-          await firebaseDashboard.updateCustomClaims(userID, req.body.newClaims);
+          await firebaseApis.updateCustomClaims(userID, req.body.newClaims);
           console.log(`The claims of user ${userID} was successfully updated!`);
         } else {
           const errMsg1 = `No claims were found on the request for user  ${userID}`;
@@ -104,11 +112,7 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
           claims: req.body.newClaims,
         });
       } catch (err) {
-        console.error(`Error: ${err.stack}`);
-        return res.json({
-          isSuccessful: false,
-          reason: err.message,
-        });
+        return handleFailure(res, err);
       }
     } else {
       return res.json({
@@ -124,11 +128,11 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
         if (!req.body.email) {
           return res.json({
             isSuccessful: false,
-            reason: 'Email paramter is missing!',
+            reason: 'Email parameter is missing!',
           });
         }
 
-        const newUser = await firebaseDashboard.createUser(
+        const newUser = await firebaseApis.createUser(
           req.body.email,
           req.body.password,
           req.body.displayName,
@@ -146,17 +150,12 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
         });
       }
     } catch (err) {
-      const errStr = `Error: ${err.stack}`;
-      console.error(errStr);
-      return res.json({
-        isSuccessful: false,
-        reason: errStr,
-      });
+      return handleFailure(res, err);
     }
   });
 
   router.post('/resetPassword', (req, res) => {
-    return firebaseDashboard
+    return firebaseApis
       .resetPassword(req.body.email)
       .then(isSuccessful => {
         return res.json({
@@ -194,23 +193,18 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
       if (!('shouldBeDisabled' in req.body)) {
         return res.json({
           isSuccessful: false,
-          reason: `'shouldBeDisabled' paramter (boolean) is missing in request!`,
+          reason: `'shouldBeDisabled' parameter (boolean) is missing in request!`,
         });
       }
 
-      await firebaseDashboard.changeUserDisableEnableStatus(userID, req.body.shouldBeDisabled);
+      await firebaseApis.changeUserDisableEnableStatus(userID, req.body.shouldBeDisabled);
 
       return res.json({
         isSuccessful: true,
         userID,
       });
     } catch (err) {
-      const errStr = `Error: ${err.stack}`;
-      console.error(errStr);
-      return res.json({
-        isSuccessful: false,
-        reason: errStr,
-      });
+      return handleFailure(res, err);
     }
   });
 
@@ -227,7 +221,7 @@ export default function createRoutes(firebaseDashboard: FirebaseDashboard): expr
     /* Bearer token */
     const bearer = 'bearer ';
     if (req.headers.authorization?.toLowerCase().startsWith(bearer)) {
-      token = req.headers.authorization.substr(bearer.length);
+      token = req.headers.authorization.substring(bearer.length);
       authType = 'bearer';
     }
     return res.send(
