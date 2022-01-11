@@ -2,16 +2,16 @@
   "name": "firebase-express-dashboard",
   "version": "0.4.5",
   "description": "",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
   "files": [
-    "dist/**/*",
-    "!dist/demo*"
+    "dist/src/**/*",
+    "!dist/src/demo*"
   ],
   "scripts": {
     "task:clean": "rimraf ./dist",
     "task:typescript": "tsc -sourcemap",
-    "task:static": "shx cp -R ./src/public ./dist",
+    "task:static": "shx cp -R ./src/public ./dist/src",
     "task:eslint": "eslint --ignore-path .gitignore . --fix",
     "task:jest": "jest --forceExit",
     "task:codecov": "dotenv codecov -f coverage/*.json",
@@ -20,7 +20,7 @@
     "prepare": "npm run build && husky install",
     "prestart": "npm run build",
     "build": "npm-run-all task:clean task:eslint task:typescript task:static",
-    "start": "node -r source-map-support/register dist/demo.js"
+    "start": "node -r source-map-support/register dist/src/demo.js"
   },
   "bugs": {
     "url": "https://github.com/Asaf-S/firebase-express-dashboard/issues"
