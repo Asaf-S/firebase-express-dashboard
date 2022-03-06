@@ -5,7 +5,7 @@
 </head>
 
 <body>
-  <div style="display: flex; " >
+  <div style="display: flex; ">
     <h1 style="margin-right: 30px;">Users</h1>
     <div style="display: flex; align-items: center;">
       <button onclick="createNewUser()">Create new user</button>
@@ -27,23 +27,22 @@
       const headers = {
         'Content-Type': 'application/json',
       };
-      switch(window.authType)
-      {
+      switch (window.authType) {
         case 'bearer':
-          headers.Authorization='Bearer '+window.token;
+          headers.Authorization = 'Bearer ' + window.token;
           break;
 
         default:
-          /*DO NOTHING*/
+        /*DO NOTHING*/
       }
 
-      return superagent(method,'BASE_URL__BASE_URL__BASE_URL'+url)
+      return superagent(method, 'BASE_URL__BASE_URL__BASE_URL' + url)
         .set(headers)
         .send(body && JSON.stringify(body));
     }
 
     function refreshUserList() {
-      mainElement.innerHTML=`Loading...`;
+      mainElement.innerHTML = `Loading...`;
       return sendToServer('users', null, 'GET')
         .then(function (res) {
           let shouldIconAttributionBeShown = false;
@@ -57,7 +56,10 @@
               <th>Creation Time</th>
               <th>Last Sign In</th>
               <th>Providers</th>
-              ${res.body.hasIsOwnerField ? '<th>Is Owner</th>':''}
+              ${res.body.hasIsOwnerField ? '<th>Is Owner</th>' : ''}
+              ${res.body.specialColumns.map((item) => {
+                return `<th>${item.title}</th>`;
+              }).join('')}
               <th>Claims</th>
               <th>Actions</th>
             </tr>
@@ -65,7 +67,7 @@
           const htmlTable_data = res.body.users.map((user) => {
             const lastSignInTime_Date = new Date(user.metadata.lastSignInTime);
             const lastSignInTime_String = lastSignInTime_Date.getTime() ? lastSignInTime_Date.toISOString().replace('T', ' ').replace('.000Z', '') : "Never";
-            if(res.body.hasIsOwnerField && user.isOwner) {
+            if (res.body.hasIsOwnerField && user.isOwner) {
               shouldIconAttributionBeShown = true;
             }
 
@@ -78,14 +80,17 @@
               <td>${new Date(user.metadata.creationTime).toISOString().replace('T', ' ').replace('.000Z', '')}</td>
               <td>${lastSignInTime_String}</td>
               <td>${user.providerData.map((provider, i) => {
-                var prefix = (i == 0) ? '' : '\n';
-                if (provider.providerId === "password") {
-                  return prefix + provider.providerId + '\n';
-                } else {
-                  return prefix + JSON.stringify(provider, null, 2) + '\n';
-                }
-              })}</td>
-              ${res.body.hasIsOwnerField ? `<td>${user.isOwner ? '<img src="https://cdn.iconscout.com/icon/free/png-256/crown-1777371-1512061.png" title="Owner" alt="Owner" style="height: 24px;width: 24px;">' : ''}</td>`:'' }
+              var prefix = (i == 0) ? '' : '\n';
+              if (provider.providerId === "password") {
+                return prefix + provider.providerId + '\n';
+              } else {
+                return prefix + JSON.stringify(provider, null, 2) + '\n';
+              }
+            })}</td>
+              ${res.body.hasIsOwnerField ? `<td>${user.isOwner ? '<img src="https://cdn.iconscout.com/icon/free/png-256/crown-1777371-1512061.png" title="Owner" alt="Owner" style="height: 24px;width: 24px;">' : ''}</td>` : ''}
+              ${res.body.specialColumns.map((item) => {
+                return `<td style="text-align: center;">${user.specialValues[item.key]}</td>`;
+              }).join('')}
               <td style="text-align: center;">
                 <img
                   onclick="showClaims('${user.uid}')"
@@ -95,9 +100,9 @@
               <td>
                 ${user.emailVerified ? '' : `<button onclick="alert('${user.uid}')">Send verification email</button>`}
                 <button onclick="updateClaims('${user.uid}')">Set claims</button>
-                <button onclick="changeUserDisableEnableStatus('${user.uid}',${!user.disabled})" ${(res.body.hasIsOwnerField && user.isOwner && !user.disabled)?'disabled':''}>${user.disabled?`En`:`Dis`}able</button>
+                <button onclick="changeUserDisableEnableStatus('${user.uid}',${!user.disabled})" ${(res.body.hasIsOwnerField && user.isOwner && !user.disabled) ? 'disabled' : ''}>${user.disabled ? `En` : `Dis`}able</button>
                 <button class="dependantOnWebAPI" onclick="reset_password('${user.email}')">Reset password</button>
-                <button onclick="deleteUser('${user.uid}')" ${(res.body.hasIsOwnerField && user.isOwner)?'disabled':''}>Delete</button>
+                <button onclick="deleteUser('${user.uid}')" ${(res.body.hasIsOwnerField && user.isOwner) ? 'disabled' : ''}>Delete</button>
               </td>
             </tr>`;
           }).join('');
@@ -120,7 +125,7 @@
       const email = prompt("Please enter an email address:");
       if (email) {
         sendToServer('users/new', { email }, 'POST').then(res => {
-          if(res.body.isSuccessful) {
+          if (res.body.isSuccessful) {
             console.log(`Email: ${email}\nUser ID: ${res.body.userID}`);
             alert('New user successfully created!');
           } else {
@@ -129,15 +134,15 @@
           refreshUserList();
         });
       } else {
-        console.error(`Email=${email} (${typeof(email)})`);
+        console.error(`Email=${email} (${typeof (email)})`);
       }
     }
 
     function reset_password(email) {
-      if(confirm("Send a reset-password email to the user's email?")) {
+      if (confirm("Send a reset-password email to the user's email?")) {
 
         sendToServer('resetPassword', { email }, 'POST').then(res => {
-          if(res && res.body && res.body.isSuccessful) {
+          if (res && res.body && res.body.isSuccessful) {
             alert(`Password-reset email was sent!`);
           } else {
             console.error(`Error!\nReason: ${res.body.reason}`);
@@ -148,13 +153,13 @@
     }
 
     function deleteUser(uid) {
-      if(uid && confirm("Are you sure you want to DELETE this user?")) {
+      if (uid && confirm("Are you sure you want to DELETE this user?")) {
 
         return sendToServer(`users/${uid}`, null, 'DELETE')
           // .set(headers)
           // .send(JSON.stringify(body))
           .then(res => {
-            if(res.body.isSuccessful) {
+            if (res.body.isSuccessful) {
               console.log(`Deleted user ID: ${res.body.userID}`);
               alert('The user was successfully deleted!');
             } else {
@@ -166,14 +171,14 @@
     }
 
     function changeUserDisableEnableStatus(uid, shouldBeDisabled) {
-      if(uid && confirm(`Are you sure you want to ${shouldBeDisabled ? `DISABLE` : `ENABLE`} this user?`)) {
+      if (uid && confirm(`Are you sure you want to ${shouldBeDisabled ? `DISABLE` : `ENABLE`} this user?`)) {
 
         return sendToServer(`users/${uid}/disabled`, null, 'POST')
           .send({
             shouldBeDisabled: shouldBeDisabled,
           })
           .then(res => {
-            if(res.body.isSuccessful) {
+            if (res.body.isSuccessful) {
               const msg = `User ID: ${res.body.userID} was successfully ${shouldBeDisabled ? `DISABLED` : `ENABLED`}!`;
               console.log(msg);
               alert(msg);
@@ -188,9 +193,9 @@
     function _getClaims(uid) {
       return sendToServer(`users/${uid}/claims`, null, 'GET')
         .then(function (res) {
-          if(res.body.isSuccessful) {
+          if (res.body.isSuccessful) {
             const claims = res.body.claims;
-            if(claims) {
+            if (claims) {
               console.log(`The claims of user ${uid} are: ${JSON.stringify(claims)}`);
               return claims;
             } else {
@@ -209,7 +214,7 @@
         const parsedClaims = JSON.stringify(claims, null, 2);
         console.log(`The claims of user ${uid} are: ${parsedClaims}`);
         alert(parsedClaims);
-      }).catch((err)=>{
+      }).catch((err) => {
         alert(err.message);
       });
     }
@@ -219,12 +224,12 @@
       try {
         currentClaims = await _getClaims(uid);
         currentClaims = JSON.stringify(currentClaims);
-      } catch(err) {
+      } catch (err) {
         currentClaims = '';
       }
 
       const inputFromUser = window.prompt("Provide a valid JSON object to be set as the user's claims", currentClaims);
-      if(inputFromUser) {
+      if (inputFromUser) {
         try {
           const parsedClaims = JSON.parse(inputFromUser);
           const body = {
@@ -232,7 +237,7 @@
           }
 
           sendToServer(`users/${uid}`, body, 'PUT').then(res => {
-            if(res && res.body && res.body.isSuccessful) {
+            if (res && res.body && res.body.isSuccessful) {
               const strMsg = `Claims were updated for ${uid}`;
               console.log(strMsg);
               alert(strMsg);
@@ -252,20 +257,20 @@
     }
 
     function getProjectDetails() {
-      projectIdElement.innerHTML=`Loading...`;
+      projectIdElement.innerHTML = `Loading...`;
       return sendToServer('projectDetails', null, 'GET')
         .then(function (res) {
-          if(res.body.isSuccessful && res.body.projectDetails) {
-            projectIdElement.innerHTML=res.body.projectDetails.projectId;
+          if (res.body.isSuccessful && res.body.projectDetails) {
+            projectIdElement.innerHTML = res.body.projectDetails.projectId;
             window.shouldResetButtonBeDisabled = res.body.projectDetails.shouldResetButtonBeDisabled;
           } else {
             console.error(`Error!\nReason: ${res.body.projectDetails}`);
-            projectIdElement.innerHTML="Project ID: Unknown";
+            projectIdElement.innerHTML = "Project ID: Unknown";
           }
         })
-        .catch(e=>{
+        .catch(e => {
           console.error(`Error!\nReason: ${e.stack}`);
-          projectIdElement.innerHTML="Project ID: Error";
+          projectIdElement.innerHTML = "Project ID: Error";
         });
     }
 
