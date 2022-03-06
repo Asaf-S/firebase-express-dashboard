@@ -8,7 +8,7 @@ Also, it exposes a dashboard to manage it all.
 
 See ['src/demo.ts'](https://github.com/Asaf-S/firebase-express-dashboard/blob/main/src/demo.ts) file to see how to better integrate it into your project.
 
-![Dashboard](./screenshot.png)
+![Screenshot](https://user-images.githubusercontent.com/25451220/156936292-431a06e1-0347-4871-9830-50e854c8c942.jpg)
 
 ```javascript
 import express from 'express';
@@ -75,3 +75,22 @@ express()
 - Add roles or something of that sort.
 - Support paging.
 - Support other authentication methods other than Bearer-token.
+
+# How to create your custom columns ?:
+
+Please follow in demo.ts
+
+```
+customColumns: [
+{
+  title: 'Column Title',
+  key: 'columnKey',
+  content: (userRecord: FB_admin.auth.UserRecord) => (userRecord.customClaims?.columnKey ? 'Content' : ''),
+},
+]
+```
+
+- Add array of `customColumns` with title, key & content, title will be your custom column name,
+  key will be the key name of column (which you have to set in Custom Claims with value true) and content wll be the value of cell.
+
+- Now set the key name value to true of any row in Custom Claims if you want to show content for that specific row.
