@@ -40,6 +40,7 @@ export function createRoutes(firebaseApis: FirebaseAPIs): express.Router {
         return res.json({
           users: userList,
           hasIsOwnerField: firebaseApis.getProjectDetails().hasIsOwnerField,
+          specialColumns: firebaseApis.getProjectDetails().specialColumns,
         });
       })
       .catch(err => {

@@ -1,12 +1,19 @@
 'use strict';
 
 import * as FirebaseAdmin from 'firebase-admin';
+import { stringify } from 'querystring';
 import superagent from 'superagent';
 import { IEnhancedUserRecord } from './types';
 
 // Docs:
 // https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
 // https://firebase.google.com/docs/reference/rest/auth/
+
+export interface ICustomColumn {
+  title: string;
+  key: string;
+  content: (userRecord: FirebaseAdmin.auth.UserRecord) => string;
+}
 
 export interface IOptions {
   middleware?: string;
@@ -19,6 +26,7 @@ export interface IOptions {
    * this library).
    */
   isOwner?: (userRecord: FirebaseAdmin.auth.UserRecord) => boolean;
+  customColumns?: Array<ICustomColumn>;
 }
 
 function parseOptions(options: IOptions): IOptions {
@@ -75,6 +83,7 @@ export class FirebaseAPIs {
       shouldResetButtonBeDisabled: !this.options.webAPI,
       projectId,
       hasIsOwnerField: !!this.options.isOwner,
+      specialColumns: this.options.customColumns,
     };
   }
 
@@ -93,6 +102,12 @@ export class FirebaseAPIs {
 
             if (this.options.isOwner) {
               parsedResponse.isOwner = this.options.isOwner(userRecord);
+            }
+            if (this.options.customColumns && Array.isArray(this.options.customColumns)) {
+              parsedResponse.specialValues = {};
+              for (const column of this.options.customColumns) {
+                parsedResponse.specialValues[column.key] = column.content(userRecord);
+              }
             }
             userList.push(parsedResponse);
           });

@@ -103,6 +103,21 @@ const FB_options: IOptions = {
   werePermissionsTakenCareOf: true, // This should be set to 'true' only when the permissions are actually taken care of and are tested
   webAPI: process.env.FIREBASE_WEB_API || '', // This allows making some more actions like Reset password, etc.
   isOwner: (userRecord: FB_admin.auth.UserRecord) => userRecord.customClaims?.isOwner,
+  customColumns: [
+    {
+      title: 'Is Paid',
+      key: 'isPaid',
+      content: (userRecord: FB_admin.auth.UserRecord) => (userRecord.customClaims?.isPaid ? '$' : ''),
+    },
+    {
+      title: 'Profile Image',
+      key: 'profileImage',
+      content: (userRecord: FB_admin.auth.UserRecord) =>
+        userRecord.customClaims?.profileImage
+          ? '<img src="https://png.pngitem.com/pimgs/s/78-786293_1240-x-1240-0-avatar-profile-icon-png.png" width="35px">'
+          : '',
+    },
+  ],
 };
 
 const app = express()
