@@ -19,7 +19,7 @@
     "release": "np",
     "prepare": "npm run build && husky install",
     "prestart": "npm run build",
-    "build": "npm-run-all task:clean task:eslint task:typescript task:static",
+    "build": "npm-run-all task:clean task:typescript task:static task:eslint",
     "start": "node -r source-map-support/register dist/src/demo.js"
   },
   "bugs": {
@@ -47,9 +47,11 @@
     "codecov": "^3.8.3",
     "dotenv": "^9.0.2",
     "dotenv-cli": "^4.1.0",
+    "eslint": "^8.23.0",
     "husky": "^6.0.0",
     "jest": "26.6.0",
     "lint-staged": "^10.5.4",
+    "np": "*",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.2.1",
     "rimraf": "^3.0.2",
@@ -60,11 +62,9 @@
   "dependencies": {
     "@types/node": "^15.0.2",
     "cors": "^2.8.5",
-    "eslint": "^8.6.0",
     "express": "^4.17.1",
     "firebase-admin": "^9.5.0",
     "json-stringify-safe": "^5.0.1",
-    "np": "*",
     "superagent": "^6.1.0",
     "typescript": "^4.6.2"
   }
