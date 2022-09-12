@@ -211,6 +211,13 @@ export class FirebaseAPIs {
     console.log(`Successfully ${shouldBeDisabled ? 'disabled' : 'enabled'} user: ${uid}`);
   }
 
+  async changeUserEmailVerificationStatus(uid: string, shouldBeVerified: boolean): Promise<void> {
+    await this.firebase.auth().updateUser(uid, {
+      emailVerified: shouldBeVerified,
+    });
+    console.log(`Successfully set email as ${shouldBeVerified ? '' : 'not '}verified (user: ${uid})`);
+  }
+
   async getClaims(uid: string): Promise<{ [key: string]: unknown } | undefined | null> {
     const user = await this.firebase.auth().getUser(uid);
     return user.customClaims;
