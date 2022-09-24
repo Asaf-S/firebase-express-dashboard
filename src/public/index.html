@@ -51,6 +51,7 @@
             <tr style='background: lightgray'>
               <th>UID</th>
               <th>Email</th>
+              <th>Display Name</th>
               <th>Verified</th>
               <th>Disabled</th>
               <th>Creation Time</th>
@@ -75,6 +76,13 @@
             <tr style="color:${user.disabled ? 'gray' : 'black'}">
               <td>${user.uid}</td>
               <td>${user.email}</td>
+              <td>
+                ${user.displayName || ''}
+                <img
+                  onclick="updateDisplayName('${user.uid}')"
+                  style="cursor: pointer; width: 15px; height: 15px"
+                  src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pjxzdmcgd2lkdGg9IjUycHgiIGhlaWdodD0iNTJweCIgdmlld0JveD0iMCAwIDUyIDUyIiBkYXRhLW5hbWU9IkxheWVyIDEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik01MS40MSwxMy4wOCwzOSwuNjZBMiwyLDAsMCwwLDM3LjU5LjA4YTIsMiwwLDAsMC0xLjQyLjU4bC0zMCwzMGgwTDQuNDMsMzIuNDFhMiwyLDAsMCwwLS41NCwxTC4wNSw0OS40NmEyLDIsMCwwLDAsMiwyLjQ2LDEuNjEsMS42MSwwLDAsMCwuNDQtLjA1TDE4LjcsNDguMTlhMi4wOCwyLjA4LDAsMCwwLDEtLjU0bDEuNzYtMS43NmgwbDMwLTMwQTIsMiwwLDAsMCw1MS40MSwxMy4wOFpNNC42OSw0Ny4yNiw3LjYzLDM0LjkybDkuNTIsOS41MlpNMjAsNDEuNjVsLTkuNTktOS41OUwzNy41OSw0LjkxbDkuNTgsOS41OFoiLz48cGF0aCBkPSJNMTcuNjEsMzEuNjRhMiwyLDAsMCwwLDAsMi44MywyLDIsMCwwLDAsMi44MywwTDQwLDE0LjkxYTIsMiwwLDAsMC0yLjgyLTIuODNaIi8+PC9zdmc+">
+              </td>
               <td>${user.emailVerified ? 'V' : 'X'}</td>
               <td>${user.disabled ? 'V' : ''}</td>
               <td>${new Date(user.metadata.creationTime).toISOString().replace('T', ' ').replace('.000Z', '')}</td>
@@ -276,6 +284,36 @@
       } else {
         console.log(`User canceled updating the claims' of ${uid}`);
 
+      }
+    }
+
+    async function updateDisplayName(uid) {
+
+      const inputFromUser = window.prompt("Provide the user's new display name:");
+      if (inputFromUser) {
+        try {
+          const body = {
+            displayName: inputFromUser,
+          };
+
+          sendToServer(`users/${uid}/displayName`, body, 'POST').then(res => {
+            if (res && res.body && res.body.isSuccessful) {
+              const strMsg = `The display name was updated for ${uid}!`;
+              console.log(strMsg);
+              alert(strMsg);
+            } else {
+              const err1 = `Failed to update the display name for ${uid}!`;
+              console.error(err1);
+              alert(err1);
+            }
+            refreshUserList();
+          });
+        } catch (e) {
+          alert('An error occurred!');
+          console.error(e.stack || e);
+        }
+      } else {
+        console.log(`User canceled updating the display name of ${uid}`);
       }
     }
 

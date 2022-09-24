@@ -246,6 +246,50 @@ export function createRoutes(firebaseApis: FirebaseAPIs): express.Router {
     }
   });
 
+  router.post('/users/:userID/displayName', async (req, res) => {
+    try {
+      const userID: string = req.params?.userID;
+
+      // Validations
+      if (!userID) {
+        return res.json({
+          isSuccessful: false,
+          reason: 'User ID is missing in the path!',
+        });
+      }
+
+      if (!req.body) {
+        return res.json({
+          isSuccessful: false,
+          reason: "Request's body is empty!",
+        });
+      }
+
+      if (!('displayName' in req.body)) {
+        return res.json({
+          isSuccessful: false,
+          reason: `'displayName' parameter (boolean) is missing in request!`,
+        });
+      }
+
+      if (typeof req.body.displayName !== 'string') {
+        return res.json({
+          isSuccessful: false,
+          reason: `'displayName' parameter (boolean) is not a string!`,
+        });
+      }
+
+      await firebaseApis.updateProfile(userID, { displayName: req.body.displayName });
+
+      return res.json({
+        isSuccessful: true,
+        userID,
+      });
+    } catch (err) {
+      return handleFailure(res, err);
+    }
+  });
+
   router.get('/', (req, res) => {
     let token: string = '';
     let authType: string = '';

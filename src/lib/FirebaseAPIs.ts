@@ -231,4 +231,14 @@ export class FirebaseAPIs {
       `Successfully updated the following custom claims to user ${uid}:\n${claims && JSON.stringify(claims, null, 2)}`
     );
   }
+
+  async updateProfile(uid: string, details: Record<string, unknown>): Promise<void> {
+    // The new custom claims will propagate to the user's ID token the
+    // next time a new one is issued.
+
+    await this.firebase.auth().updateUser(uid, details);
+    console.log(
+      `Successfully updated the following user details ${uid}:\n${details && JSON.stringify(details, null, 2)}`
+    );
+  }
 }
