@@ -20,7 +20,8 @@
     "prepare": "npm run build && husky install",
     "prestart": "npm run build",
     "build": "npm-run-all task:clean task:typescript task:static task:eslint",
-    "start": "node -r source-map-support/register dist/src/demo.js"
+    "start": "node -r source-map-support/register dist/src/demo.js",
+    "update_browsersList": "npx browserslist@latest --update-db"
   },
   "bugs": {
     "url": "https://github.com/Asaf-S/firebase-express-dashboard/issues"

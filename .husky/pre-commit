@@ -12,7 +12,8 @@ echo --------- STARTING HUSKY HOOK ---------
 npx lint-staged
 npx eslint --ignore-path .gitignore . --fix
 
-npx cspell --no-summary "**/*"
+npx cspell --no-summary --no-progress --gitignore --relative "**/*"
+npm run update_browsersList
 npx tsc
 npm run test
 echo --------- FINISHING HUSKY HOOK ---------

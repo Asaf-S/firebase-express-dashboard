@@ -17,13 +17,11 @@
   "flagWords": [
   ],
   "ignorePaths": [
-    "node_modules/**/*",
-    "dist",
+    "package.json",
     "package-lock.json",
     ".jshintrc",
     ".prettierrc",
     "**/__nock-fixtures__/**",
-    "coverage",
     "*firebaseAuthServiceAccount*.json"
   ]
 }
