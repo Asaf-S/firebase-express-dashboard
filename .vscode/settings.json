@@ -1,5 +1,8 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
   "god.tsconfig": "./tsconfig.json",
+  "editor.insertSpaces": true,
+  "editor.tabSize": 2,
   "editor.rulers": [130],
+  "editor.detectIndentation": false
 }
