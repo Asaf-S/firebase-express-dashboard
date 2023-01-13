@@ -13,7 +13,7 @@
     "task:typescript": "tsc -sourcemap",
     "task:static": "shx cp -R ./src/public ./dist/src",
     "task:eslint": "eslint --ignore-path .gitignore . --fix",
-    "task:jest": "jest --forceExit",
+    "task:jest": "FORCE_COLOR=true jest --forceExit",
     "task:codecov": "dotenv codecov -f coverage/*.json",
     "test": "npm-run-all task:clean task:jest task:codecov",
     "release": "np",
