@@ -10,7 +10,7 @@ echo --------- STARTING HUSKY HOOK ---------
 # echo Staged files [space-separated]: $files
 
 npx lint-staged
-npx eslint --ignore-path .gitignore . --fix
+npx eslint --ignore-path .gitignore . --fix --max-warnings=0
 
 npx cspell --no-summary --no-progress --gitignore --relative "**/*"
 npm run update_browsersList
